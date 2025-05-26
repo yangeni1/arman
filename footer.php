@@ -15,7 +15,7 @@
             <img src="./media/footer/Vector.png" alt="">
             <p>Будь в курсе наших акций и новостей</p>
             <input type="Email" placeholder="Ваш E-mail">
-            <button>Подписаться</button>
+            <button id="add-email-notifications">Подписаться</button>
         </div>
         <div class="container">
             <div class="container_main">
@@ -68,6 +68,8 @@
             </div>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/notifications.js"></script>
 </body>
 
 </html>

@@ -70,16 +70,25 @@ if ($is_admin) {
                                 <img src="./media/header/pirat.png" alt="Очистить">
                             </button>
                             <img src="./media/header/Rectangle 1140.png" alt="Разделитель" class="separator">
-                            <button type="button" class="search-button">
+                            <button type="button" class="search-button" id="search-button">
                                 <img src="./media/header/иконка поиска.svg" alt="Поиск" class="search-icon">
                             </button>
-                        </div>
-                        <div class="city_selector">
-                            <img src="./media/header/иконка местоположения.svg" alt="">
-                            <select name="" id="">
-                                <option value="kurgan">Курган</option>
-                                <option value="tymen">Тюмень</option>
-                            </select>
+                            <script>
+                                document.getElementById('search-button').addEventListener('click', function() {
+                                    const query = document.getElementById('search-input').value.trim();
+                                    if (query) {
+                                        const url = new URL(window.location.origin + '/catalog_products.php');
+                                        url.searchParams.set('search', query);
+                                        window.location.href = url.toString();
+                                    }
+                                });
+                                document.getElementById('search-input').addEventListener('keydown', function(event) {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                        document.getElementById('search-button').click();
+                                    }
+                                });
+                            </script>
                         </div>
                         <div class="btn_fav_backet_acc">
                             <div class="btn_main_head">

@@ -1130,6 +1130,9 @@ input:focus{
 .yel{
     background-color: #FFFCEB;
 }
+.card_news_price{
+    padding-top: 30px;
+}
 .txt_news{
     padding-right: 29px;
     padding-left: 29px;

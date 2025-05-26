@@ -277,10 +277,6 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                                     <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                     <span><?= htmlspecialchars($product['category']) ?></span>
                                     <p><?= htmlspecialchars($product['name']) ?></p>
-                                    <div class="grade">
-                                        <img src="./media/popular-product/иконка звезда отзывы.svg" alt="Рейтинг">
-                                        <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                    </div>
                                     <div class="price">
                                         <div class="price-values">
                                             <?php if ($discountPrice): ?>
@@ -392,10 +388,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                                     <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/sale/default.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                     <span><?= htmlspecialchars($product['category']) ?></span>
                                     <p><?= htmlspecialchars($product['name']) ?></p>
-                                    <div class="grade">
-                                        <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                        <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                    </div>
+                        
                                     <div class="price">
                                         <div class="price-values">
                                             <?php if ($discountPrice): ?>
@@ -439,10 +432,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="txt_news">
                                 <p>Чай Пиала Голд черный гранулированный Кофе-шоколад, 200г</p>
-                                <div class="grade_1">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(0.0)</span>
-                                </div>
+                               
                                 <div class="price-values card_news_price">
                                     <p>₽214.4</p>
                                 </div>
@@ -459,10 +449,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="txt_news">
                                 <p>Конфитрейд Сладкий календарь Леди Баг, 55 г</p>
-                                <div class="grade_1">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(0.0)</span>
-                                </div>
+                             
                                 <div class="price-values card_news_price">
                                     <p>₽99</p>
                                 </div>
@@ -479,10 +466,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="txt_news">
                                 <p>BS Конфеты Тай-Тай Шоко, крем-брюле, 1 кг </p>
-                                <div class="grade_1">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(0.0)</span>
-                                </div>
+                                
                                 <div class="price-values card_news_price">
                                     <p>₽453</p>
                                 </div>
@@ -499,10 +483,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="txt_news">
                                 <p>Новогодний подарок Полосатая семейка, 400 гр</p>
-                                <div class="grade_1">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(0.0)</span>
-                                </div>
+                               
                                 <div class="price-values card_news_price">
                                     <p>₽119</p>
                                 </div>

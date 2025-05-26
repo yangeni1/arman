@@ -1,8 +1,8 @@
 <?php
 $host = "localhost"; // Хост
 $db_name = "sonyaa64_td"; // Имя базы данных
-$username = "sonyaa64_td"; // Имя пользователя
-$password = "SScZIP!AF1XA"; // Пароль
+$username = "root"; // Имя пользователя
+$password = ""; // Пароль
 
 try {
     // Подключение к базе данных

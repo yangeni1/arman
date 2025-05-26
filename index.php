@@ -3,18 +3,16 @@ session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Арман</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="./css/style.css">
 </head>
-
 <body>
     <?php
-    include 'header.php';
+        include 'header.php';
     ?>
     <div class="container">
         <div class="container_main">
@@ -22,7 +20,7 @@ session_start();
                 <div class="swiper-button-prev custom-prev">
                     <img src="./media/banner-slider/стрелка слайдера левая.svg" alt="Previous">
                 </div>
-                <div class="swiper">
+                <div class="swiper" >
                     <!-- Additional required wrapper -->
                     <div class="swiper-wrapper">
                         <!-- Slides -->
@@ -182,10 +180,10 @@ session_start();
         </div>
     </div>
     <?php
-    require_once 'db.php';
+require_once 'db.php';
 
-    // Получаем все уникальные категории из базы данных, сортируя по среднему рейтингу
-    $categoriesQuery = $pdo->query("
+// Получаем все уникальные категории из базы данных, сортируя по среднему рейтингу
+$categoriesQuery = $pdo->query("
     SELECT category, AVG(rating) as avg_rating 
     FROM products 
     WHERE rating > 4.5
@@ -193,20 +191,20 @@ session_start();
     ORDER BY avg_rating DESC
     LIMIT 8
 ");
-    $dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
+$dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
 
-    // Добавляем "Все" в начало списка категорий
-    $categories = array_merge(['Все'], $dbCategories);
+// Добавляем "Все" в начало списка категорий
+$categories = array_merge(['Все'], $dbCategories);
 
-    // Определяем выбранную категорию (из GET-параметра)
-    $selectedCategory = $_GET['category'] ?? 'Все';
+// Определяем выбранную категорию (из GET-параметра)
+$selectedCategory = $_GET['category'] ?? 'Все';
 
-    // Формируем SQL-запрос в зависимости от выбранной категории
-    $sql = "SELECT * FROM products WHERE rating > 4.5";
-    if ($selectedCategory !== 'Все') {
-        $sql .= " WHERE category = :category";
-    }
-    $sql .= " ORDER BY 
+// Формируем SQL-запрос в зависимости от выбранной категории
+$sql = "SELECT * FROM products WHERE rating > 4.5";
+if ($selectedCategory !== 'Все') {
+    $sql .= " WHERE category = :category";
+}
+$sql .= " ORDER BY 
           CASE 
               WHEN status = 'хит' THEN 1
               WHEN status = 'новинка' THEN 2
@@ -216,15 +214,15 @@ session_start();
           END, rating DESC
           LIMIT 8";
 
-    // Подготавливаем и выполняем запрос
-    $query = $pdo->prepare($sql);
-    if ($selectedCategory !== 'Все') {
-        $query->execute([':category' => $selectedCategory]);
-    } else {
-        $query->execute();
-    }
-    $products = $query->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+// Подготавливаем и выполняем запрос
+$query = $pdo->prepare($sql);
+if ($selectedCategory !== 'Все') {
+    $query->execute([':category' => $selectedCategory]);
+} else {
+    $query->execute();
+}
+$products = $query->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 <div class="container">
     <div class="container_main">
@@ -297,96 +295,36 @@ session_start();
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="container_slider_2">
-                        <div class="swiper-button-prev custom-prev2">
-                            <img src="./media/popular-product/Tabpanel-left.png" alt="Previous">
-                        </div>
-                        <div class="swiper2">
-                            <div class="swiper-wrapper">
-                                <?php if (empty($products)): ?>
-                                    <div class="swiper-slide">
-                                        <p>Товары не найдены</p>
-                                    </div>
-                                <?php else: ?>
-                                    <?php foreach ($products as $product):
-                                        $discountPrice = $product['discount_percentage']
-                                            ? $product['price'] * (1 - $product['discount_percentage'] / 100)
-                                            : null;
-                                    ?>
-                                        <div class="swiper-slide product-card" data-name="<?= htmlspecialchars($product['name']) ?>" data-description="<?= htmlspecialchars($product['description']) ?>">
-                                            <?php if ($product['status'] == 'хит'): ?>
-                                                <div class="badge_xit">
-                                                    <p>Хит</p>
-                                                </div>
-                                            <?php elseif ($product['status'] == 'распродажа'): ?>
-                                                <div class="badge_rasp">
-                                                    <p>Распродажа</p>
-                                                </div>
-                                            <?php elseif ($product['status'] == 'новинка'): ?>
-                                                <div class="badge_new">
-                                                    <p>Новинка</p>
-                                                </div>
-                                            <?php elseif ($product['discount_percentage']): ?>
-                                                <div class="badge_sale">
-                                                    <p>-<?= round($product['discount_percentage']) ?>%</p>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                                            <span><?= htmlspecialchars($product['category']) ?></span>
-                                            <p><?= htmlspecialchars($product['name']) ?></p>
-                                            <div class="grade">
-                                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="Рейтинг">
-                                                <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                            </div>
-                                            <div class="price">
-                                                <div class="price-values">
-                                                    <?php if ($discountPrice): ?>
-                                                        <p>₽<?= number_format($discountPrice, 2) ?></p>
-                                                        <span>₽<?= number_format($product['price'], 2) ?></span>
-                                                    <?php else: ?>
-                                                        <p>₽<?= number_format($product['price'], 2) ?></p>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                                    <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                                </button>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="swiper-button-next custom-next2">
-                            <img src="./media/popular-product/Tabpanel.png" alt="Next">
-                        </div>
+                    <div class="swiper-button-next custom-next2">
+                        <img src="./media/popular-product/Tabpanel.png" alt="Next">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <?php
-    require_once 'db.php';
+</div>
+<?php
+require_once 'db.php';
 
-    // Получаем категории товаров со скидками
-    $categoriesQuery = $pdo->query("SELECT DISTINCT category FROM products WHERE discount_percentage IS NOT NULL OR status = 'распродажа'");
-    $dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
-    $categories = array_merge(['Все'], $dbCategories);
+// Получаем категории товаров со скидками
+$categoriesQuery = $pdo->query("SELECT DISTINCT category FROM products WHERE discount_percentage IS NOT NULL OR status = 'распродажа'");
+$dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
+$categories = array_merge(['Все'], $dbCategories);
 
-    // Определяем выбранную категорию
-    $selectedCategory = $_GET['category'] ?? 'Все';
+// Определяем выбранную категорию
+$selectedCategory = $_GET['category'] ?? 'Все';
 
-    // Формируем SQL-запрос для товаров со скидками
-    $sql = "SELECT * FROM products 
+// Формируем SQL-запрос для товаров со скидками
+$sql = "SELECT * FROM products 
         WHERE (discount_percentage IS NOT NULL OR status = 'распродажа')";
 
-    // Добавляем фильтр по категории если нужно
-    if ($selectedCategory !== 'Все') {
-        $sql .= " AND category = :category";
-    }
+// Добавляем фильтр по категории если нужно
+if ($selectedCategory !== 'Все') {
+    $sql .= " AND category = :category";
+}
 
-    // Сортировка для акционных товаров
-    $sql .= " ORDER BY 
+// Сортировка для акционных товаров
+$sql .= " ORDER BY 
           CASE 
               WHEN status = 'распродажа' THEN 1
               ELSE 2
@@ -395,29 +333,40 @@ session_start();
           rating DESC
           LIMIT 12";
 
-    // Подготавливаем и выполняем запрос
-    $query = $pdo->prepare($sql);
-    if ($selectedCategory !== 'Все') {
-        $query->execute([':category' => $selectedCategory]);
-    } else {
-        $query->execute();
-    }
-    $products = $query->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+// Подготавливаем и выполняем запрос
+$query = $pdo->prepare($sql);
+if ($selectedCategory !== 'Все') {
+    $query->execute([':category' => $selectedCategory]);
+} else {
+    $query->execute();
+}
+$products = $query->fetchAll(PDO::FETCH_ASSOC);
+?>
 
-    <div class="container">
-        <div class="container_main">
-            <div class="container_promotions">
-                <div class="promotions">
-                    <div class="txt_preview">
-                        <p>Акции & скидки</p>
-                        <div class="btn_promotions">
-                            <?php foreach ($categories as $category): ?>
-                                <a href="?category=<?= urlencode($category) ?>"
-                                    class="<?= $category === $selectedCategory ? 'active' : '' ?>">
-                                    <?= htmlspecialchars($category) ?>
-                                </a>
-                            <?php endforeach; ?>
+<div class="container">
+    <div class="container_main">
+        <div class="container_promotions">
+            <div class="promotions">
+                <div class="txt_preview">
+                    <p>Акции & скидки</p>
+                    <div class="btn_promotions">
+                        <?php foreach ($categories as $category): ?>
+                            <a href="?category=<?= urlencode($category) ?>"
+                               class="<?= $category === $selectedCategory ? 'active' : '' ?>">
+                                <?= htmlspecialchars($category) ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div class="container_promotions_banner_slider">
+                    <div class="promotions_banner">
+                        <p>Суперскидки: больше товаров – меньше цен!</p>
+                        <button class="promotion_banner_btn">Купить сейчас<img src="./media/banner/иконка стрелочка.svg" alt=""></button>
+                        <img src="./media/promotions/image 662.png" alt="">
+                    </div>
+                    <div class="container_slider_3">
+                        <div class="swiper-button-prev custom-prev3">
+                            <img src="./media/popular-product/Tabpanel-left.png" alt="Previous">
                         </div>
                         <div class="swiper3">
                             <div class="swiper-wrapper" id="promotions-container">
@@ -457,17 +406,24 @@ session_start();
                                 <?php endforeach; ?>
                             </div>
                         </div>
+                        <div class="swiper-button-next custom-next3">
+                            <img src="./media/popular-product/Tabpanel.png" alt="Next">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container">
+</div>
+<div class="container">
         <div class="container_main">
             <div class="container_news">
                 <div class="news">
                     <div class="txt_preview">
                         <p>Новинки</p>
+                        <div class="btn_news">
+                            <a href="">Все предложения <img src="./media/news/Link.svg" alt=""></a>
+                        </div>
                     </div>
                     <div class="container_news_card">
                         <div class="card_news">
@@ -527,7 +483,6 @@ session_start();
                             </div>
                             <div class="txt_news">
                                 <p>Новогодний подарок Полосатая семейка, 400 гр</p>
-                               
                                 <div class="price-values card_news_price">
                                     <p>₽119</p>
                                 </div>
@@ -545,14 +500,14 @@ session_start();
     </div>
     <div class="container">
         <div class="container_main">
-            <div class="container_about" id="about-us">
+            <div class="container_about">
                 <div class="txt_preview">
                     <p>О компании</p>
                 </div>
                 <div class="about">
                     <div class="txt_about">
                         <p class="main_txt_about"><span>Торговый дом АРМАН</span> — занимается оптово-розничной торговлей продукции для чаепития</p>
-                        <p class="txt_about_1">В интернет-магазине Арман вы найдете широкий ассортимент продукции для чаепития российского-казахстанского производства:</p>
+                        <p class="txt_about_1">В интернет-магазине Арман вы найдете широкий ассортимент продукции для чаепития казахстанского производства:</p>
                         <div class="txt_about_product">
                             <p>— Конфеты</p>
                             <p>— Карамель</p>
@@ -560,7 +515,7 @@ session_start();
                             <p>— Драже и многое другое.</p>
                         </div>
                         <p class="txt_about_2">У нас свежая продукция с широким ассортиментом и постоянным обновлением. Осуществляем доставку товаров по России.</p>
-                        <a href="/about.php" class="btn_about">Подробности</a>
+                        <a href="" class="btn_about">Подробности</a>
                     </div>
                     <div class="img_about">
                         <img src="./media/about/people.png" alt="">
@@ -573,7 +528,7 @@ session_start();
     <button class="sroll" id="scrollToTopBtn"><img src="./media/scroll/scroll.png" alt=""></button>
     <!-- end scroll -->
     <?php
-    include 'footer.php';
+        include 'footer.php';
     ?>
     <script src="js/product-modal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -581,29 +536,29 @@ session_start();
         const swiper = new Swiper('.swiper', {
             // If we need pagination
             pagination: {
-                el: '.custom-pagination',
-                type: 'bullets', // Тип пагинации
+            el: '.custom-pagination',
+            type: 'bullets', // Тип пагинации
             },
             loop: true, // Циклическая прокрутка слайдов
             // Navigation arrows
             navigation: {
-                nextEl: '.custom-next',
-                prevEl: '.custom-prev',
+            nextEl: '.custom-next',
+            prevEl: '.custom-prev',
             },
         });
         // Инициализация Swiper
         const swiper2 = new Swiper('.swiper2', {
             slidesPerView: 5,
             navigation: {
-                nextEl: '.custom-next2',
-                prevEl: '.custom-prev2',
+            nextEl: '.custom-next2',
+            prevEl: '.custom-prev2',
             },
         });
         const swiper3 = new Swiper('.swiper3', {
             slidesPerView: 4,
             navigation: {
-                nextEl: '.custom-next3',
-                prevEl: '.custom-prev3',
+            nextEl: '.custom-next3',
+            prevEl: '.custom-prev3',
             },
         });
 
@@ -611,15 +566,15 @@ session_start();
         document.querySelectorAll('.btn_preview a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-
+                
                 // Удаляем класс active у всех ссылок
                 document.querySelectorAll('.btn_preview a').forEach(a => a.classList.remove('active'));
                 // Добавляем класс active к нажатой ссылке
                 this.classList.add('active');
-
+                
                 // Получаем категорию из href
                 const category = this.getAttribute('href').split('=')[1];
-
+                
                 // Отправляем AJAX-запрос
                 fetch(`get_products.php?category=${category}`)
                     .then(response => response.text())
@@ -627,7 +582,7 @@ session_start();
                         // Обновляем содержимое слайдера
                         const swiperWrapper = document.querySelector('.swiper2 .swiper-wrapper');
                         swiperWrapper.innerHTML = html;
-
+                        
                         // Обновляем Swiper
                         swiper2.update();
                     })
@@ -639,15 +594,15 @@ session_start();
         document.querySelectorAll('.btn_promotions a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-
+                
                 // Удаляем класс active у всех ссылок
                 document.querySelectorAll('.btn_promotions a').forEach(a => a.classList.remove('active'));
                 // Добавляем класс active к нажатой ссылке
                 this.classList.add('active');
-
+                
                 // Получаем категорию из href
                 const category = this.getAttribute('href').split('=')[1];
-
+                
                 // Отправляем AJAX-запрос
                 fetch(`get_promotions.php?category=${category}`)
                     .then(response => response.text())
@@ -655,7 +610,7 @@ session_start();
                         // Обновляем содержимое слайдера
                         const swiperWrapper = document.querySelector('.swiper3 .swiper-wrapper');
                         swiperWrapper.innerHTML = html;
-
+                        
                         // Обновляем Swiper
                         swiper3.update();
                     })
@@ -668,19 +623,19 @@ session_start();
         const nextButton = document.querySelector('.custom-next img');
 
         // Задаем новые изображения при наведении
-        prevButton.addEventListener('mouseover', function() {
+        prevButton.addEventListener('mouseover', function () {
             this.src = './media/banner-slider/послелевая.svg';
         });
 
-        prevButton.addEventListener('mouseout', function() {
+        prevButton.addEventListener('mouseout', function () {
             this.src = './media/banner-slider/стрелка слайдера левая.svg';
         });
 
-        nextButton.addEventListener('mouseover', function() {
+        nextButton.addEventListener('mouseover', function () {
             this.src = './media/banner-slider/послеправая.svg';
         });
 
-        nextButton.addEventListener('mouseout', function() {
+        nextButton.addEventListener('mouseout', function () {
             this.src = './media/banner-slider/стрелка слайдера правая.svg';
         });
         // кнопка вверх
@@ -734,7 +689,7 @@ session_start();
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-
+                    
                     const productId = this.getAttribute('data-product-id');
                     console.log('Adding to cart product ID:', productId);
 
@@ -751,7 +706,7 @@ session_start();
                                     const popupRegButton = document.querySelector('.popup_reg');
                                     const inputFieldsReg = document.querySelector('.input_fields_reg');
                                     const inputFieldsLog = document.querySelector('.input_fields_login');
-
+                                    
                                     popupLogButton.style.color = "#5E9F67";
                                     popupRegButton.style.color = "#253D4E";
                                     inputFieldsReg.style.display = 'none';
@@ -765,50 +720,50 @@ session_start();
                             formData.append('product_id', productId);
 
                             fetch('add_to_cart.php', {
-                                    method: 'POST',
-                                    body: formData
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Показываем уведомление об успешном добавлении
-                                        const notification = document.createElement('div');
-                                        notification.className = 'success-message';
-                                        notification.textContent = data.message || 'Товар успешно добавлен в корзину';
-                                        document.body.appendChild(notification);
-
-                                        // Удаляем уведомление через 3 секунды
-                                        setTimeout(() => {
-                                            notification.style.opacity = '0';
-                                            setTimeout(() => notification.remove(), 500);
-                                        }, 3000);
-                                    } else {
-                                        // Показываем сообщение об ошибке
-                                        const errorNotification = document.createElement('div');
-                                        errorNotification.className = 'error-message';
-                                        errorNotification.textContent = data.message || 'Произошла ошибка при добавлении товара в корзину';
-                                        document.body.appendChild(errorNotification);
-
-                                        // Удаляем уведомление через 3 секунды
-                                        setTimeout(() => {
-                                            errorNotification.style.opacity = '0';
-                                            setTimeout(() => errorNotification.remove(), 500);
-                                        }, 3000);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Показываем уведомление об успешном добавлении
+                                    const notification = document.createElement('div');
+                                    notification.className = 'success-message';
+                                    notification.textContent = data.message || 'Товар успешно добавлен в корзину';
+                                    document.body.appendChild(notification);
+                                    
+                                    // Удаляем уведомление через 3 секунды
+                                    setTimeout(() => {
+                                        notification.style.opacity = '0';
+                                        setTimeout(() => notification.remove(), 500);
+                                    }, 3000);
+                                } else {
+                                    // Показываем сообщение об ошибке
                                     const errorNotification = document.createElement('div');
                                     errorNotification.className = 'error-message';
-                                    errorNotification.textContent = 'Произошла ошибка при добавлении товара в корзину';
+                                    errorNotification.textContent = data.message || 'Произошла ошибка при добавлении товара в корзину';
                                     document.body.appendChild(errorNotification);
-
+                                    
                                     // Удаляем уведомление через 3 секунды
                                     setTimeout(() => {
                                         errorNotification.style.opacity = '0';
                                         setTimeout(() => errorNotification.remove(), 500);
                                     }, 3000);
-                                });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                const errorNotification = document.createElement('div');
+                                errorNotification.className = 'error-message';
+                                errorNotification.textContent = 'Произошла ошибка при добавлении товара в корзину';
+                                document.body.appendChild(errorNotification);
+                                
+                                // Удаляем уведомление через 3 секунды
+                                setTimeout(() => {
+                                    errorNotification.style.opacity = '0';
+                                    setTimeout(() => errorNotification.remove(), 500);
+                                }, 3000);
+                            });
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -816,7 +771,7 @@ session_start();
                             errorNotification.className = 'error-message';
                             errorNotification.textContent = 'Произошла ошибка при проверке авторизации';
                             document.body.appendChild(errorNotification);
-
+                            
                             // Удаляем уведомление через 3 секунды
                             setTimeout(() => {
                                 errorNotification.style.opacity = '0';
@@ -827,7 +782,5 @@ session_start();
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
-
-</html>
+</html> 

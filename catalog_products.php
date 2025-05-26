@@ -190,8 +190,6 @@
                                 <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
                                     <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
                                 </button>
-=======
-
                             </div>
                         </div>
                         <?php endforeach; ?>

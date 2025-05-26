@@ -165,10 +165,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -218,10 +214,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -271,10 +263,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -324,10 +312,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -377,10 +361,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -430,10 +410,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -483,10 +459,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>
@@ -536,10 +508,6 @@
                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="grade">
-                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                </div>
                                 <div class="price">
                                     <div class="price-values">
                                         <?php if ($discountPrice): ?>

@@ -15,14 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="txt_modal_tovar">
                         <h2 class="product-modal-title"></h2>
                         <p class="product-modal-rating">
-                            <div class="stars">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <span class="rating-value"></span>
-                            </div>
                         </p>
                         <span class="product-modal-description"></span>
                         <div class="price_modal_tovar">
@@ -123,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalImage = modal.querySelector('.product-modal-image');
         const modalTitle = modal.querySelector('.product-modal-title');
         const modalCategory = modal.querySelector('.product-modal-category');
-        const modalRating = modal.querySelector('.rating-value');
         const modalPrice = modal.querySelector('.product-modal-price');
         const modalDescription = modal.querySelector('.product-modal-description');
         const addToCartBtn = modal.querySelector('.product-modal-add-to-cart');
@@ -133,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modalImage.alt = productData.name;
         modalTitle.textContent = productData.name;
         modalCategory.textContent = productData.category;
-        modalRating.textContent = `(${productData.rating})`;
         modalDescription.textContent = productData.description || 'Описание отсутствует';
         modalPrice.textContent = `₽${formatPrice(parseFloat(productData.price))}`;
 
@@ -193,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         image: this.querySelector('.img_product-card').src,
                         name: this.querySelector('p').textContent,
                         category: this.querySelector('span').textContent,
-                        rating: this.querySelector('.grade span').textContent.replace(/[()]/g, ''),
                         price: oldPriceElement ? oldPriceElement.textContent.replace('₽', '') : priceElement.textContent.replace('₽', ''),
                         description: this.getAttribute('data-description') || ''
                     };

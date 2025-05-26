@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Арман</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="./css/style.css">
 </head>
+
 <body>
     <footer>
         <div class="newsletter">
             <img src="./media/footer/Vector.png" alt="">
             <p>Будь в курсе наших акций и новостей</p>
             <input type="Email" placeholder="Ваш E-mail">
-            <button>Подписаться</button>
+            <button id="add-email-notifications">Подписаться</button>
         </div>
         <div class="container">
             <div class="container_main">
@@ -23,10 +25,12 @@
                         <p>© 2024 OOO «ТД Арман»</p>
                     </div>
                     <div class="about_footer_down">
-                        <a href=""><p>О компании</p></a>
-                        <a href=""><span>О нас</span></a>
-                        <a href=""><span>Доставка & оплата</span></a>
-                        <a href=""><span>Контакты</span></a>
+                        <a href="#about-us">
+                            <p>О компании</p>
+                        </a>
+                        <a href="/about.php"><span>О нас</span></a>
+                        <a href="/delivery.php"><span>Доставка & оплата</span></a>
+                        <a href="/contant.php"><span>Контакты</span></a>
                     </div>
                     <div class="location_footer_down">
                         <p>Розничный магазин:</p>
@@ -37,13 +41,17 @@
                         <p>Остались вопросы? мы всегда на связи:</p>
                         <div class="messenger">
                             <div>
-                                <img src="./media/footer/viber.png" alt="">
+                                <a href="tel:+79920300072"><img src="./media/footer/viber.png" alt=""></a>
                             </div>
                             <div>
-                                <img src="./media/footer/whatsapp.png" alt="">
+                                <a href="tel:+79920300072">
+                                    <img src="./media/footer/whatsapp.png" alt="">
+                                </a>
                             </div>
                             <div>
-                                <img src="./media/footer/telegram.png" alt="">
+                                <a href="tel:+79920300072">
+                                    <img src="./media/footer/telegram.png" alt="">
+                                </a>
                             </div>
                         </div>
                         <p>Мы принимаем</p>
@@ -60,5 +68,8 @@
             </div>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/notifications.js"></script>
 </body>
-</html> 
+
+</html>

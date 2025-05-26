@@ -139,7 +139,7 @@ if ($is_admin) {
                                 <p>Новинки</p>
                             </a>
                             <a href="delivery.php">
-                                <p>Доставака и оплата</p>
+                                <p>Доставка и оплата</p>
                             </a>
                             <a href="about.php">
                                 <p>О нас</p>

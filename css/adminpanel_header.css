@@ -1,0 +1,55 @@
+@font-face {
+    font-family:"Lato";
+    src: url("../fonts/Lato/Lato-Regular.ttf");
+}
+@font-face {
+    font-family: "Quicksand";
+    src: url("../fonts//newfonts/ofont.ru_Quicksand.ttf");
+}
+@font-face {
+    font-family: "Quicksand-regular";
+    src: url("../fonts/newfonts/ofont.ru_Quicksand regular.ttf");
+}
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat/Montserrat-Regular.ttf");
+}
+.btn_menu_header_adminpanel {
+    display: flex;
+    font-family: "Quicksand-Bold", sans-serif;
+    gap: 30px;
+}
+.header_menu_adminpanel{
+    padding-bottom: 13px;
+    margin-top: 15px;
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+}
+.header_menu_adminpanel>a{
+    font-size: 16px;
+    color: #253D4E;
+    font-family: "Quicksand";
+    font-weight: 700;
+    text-decoration: none;
+}
+.txt_admin_panel_header{
+    margin-right: 65px;
+}
+.txt_admin_panel_header>p{
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 32px;
+    color: #64AC5C;
+    font-family: "Quicksand";
+    font-weight: 700;
+    text-decoration: none;
+}
+.txt_admin_panel_header>span{
+    text-align: center;
+    font-size: 20px;
+    color: #253D4E;
+    font-family: "Quicksand";
+    font-weight: 700;
+    text-decoration: none;
+}

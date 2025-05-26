@@ -520,7 +520,7 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
     </div>
     <div class="container">
         <div class="container_main">
-            <div class="container_about">
+            <div class="container_about" id="about-us">
                 <div class="txt_preview">
                     <p>О компании</p>
                 </div>

@@ -23,10 +23,10 @@
                         <p>© 2024 OOO «ТД Арман»</p>
                     </div>
                     <div class="about_footer_down">
-                        <a href=""><p>О компании</p></a>
-                        <a href=""><span>О нас</span></a>
-                        <a href=""><span>Доставка & оплата</span></a>
-                        <a href=""><span>Контакты</span></a>
+                        <a href="#about-us"><p>О компании</p></a>
+                        <a href="/about.php"><span>О нас</span></a>
+                        <a href="/delivery.php"><span>Доставка & оплата</span></a>
+                        <a href="/contant.php"><span>Контакты</span></a>
                     </div>
                     <div class="location_footer_down">
                         <p>Розничный магазин:</p>

@@ -367,7 +367,7 @@ session_start();
                     <div class="container_promotions_banner_slider">
                         <div class="promotions_banner">
                             <p>Суперскидки: больше товаров – меньше цен!</p>
-                            <button class="promotion_banner_btn">Купить сейчас<img src="./media/banner/иконка стрелочка.svg" alt=""></button>
+                            <button class="promotion_banner_btn"><a href="/auction.php" style="color: #ffffff; text-decoration:none;">Купить сейчас</a><img src="./media/banner/иконка стрелочка.svg" alt=""></button>
                             <img src="./media/promotions/image 662.png" alt="">
                         </div>
                         <div class="container_slider_3">

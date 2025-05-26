@@ -14,8 +14,13 @@
         
         // Получаем максимальную цену для текущей категории
         $category = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'Все товары';
-        $maxPriceQuery = $pdo->prepare("SELECT MAX(price) as max_price FROM products WHERE category = :category");
-        $maxPriceQuery->execute([':category' => $category]);
+        if ($category === 'Все товары') {
+            $maxPriceQuery = $pdo->prepare("SELECT MAX(price) as max_price FROM products");
+            $maxPriceQuery->execute();
+        } else {
+            $maxPriceQuery = $pdo->prepare("SELECT MAX(price) as max_price FROM products WHERE category = :category");
+            $maxPriceQuery->execute([':category' => $category]);
+        }
         $categoryMaxPrice = $maxPriceQuery->fetch(PDO::FETCH_ASSOC)['max_price'] ?? 1000;
     ?>
     <div class="container">
@@ -94,9 +99,21 @@
                     $minPrice = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
                     $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : $categoryMaxPrice;
                     $selectedBrands = isset($_GET['brands']) ? explode(',', $_GET['brands']) : [];
+                    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-                    $sql = "SELECT * FROM products WHERE category = :category";
-                    $params = [':category' => $category];
+                    $sql = "SELECT * FROM products WHERE 1=1";
+                    $params = [];
+
+                    if (!empty($category) && $category !== 'Все товары') {
+                        $sql .= " AND category = :category";
+                        $params[':category'] = $category;
+                    }
+
+                    if (!empty($search)) {
+                        $sql .= " AND (name LIKE :search1 OR description LIKE :search2)";
+                        $params[':search1'] = '%' . $search . '%';
+                        $params[':search2'] = '%' . $search . '%';
+                    }
 
                     // Фильтрация по минимальной цене
                     if ($minPrice > 0) {
@@ -110,9 +127,14 @@
                         $params[':max_price'] = $maxPrice;
                     }
 
-                    if (!empty($selectedBrands)) {
+                    $filteredBrands = array_filter($selectedBrands, function($brand) {
+                        return !empty($brand);
+                    });
+
+                    if (!empty($filteredBrands)) {
                         $placeholders = [];
-                        foreach ($selectedBrands as $i => $brand) {
+                        $filteredBrands = array_values($filteredBrands); // Reindex array
+                        foreach ($filteredBrands as $i => $brand) {
                             $placeholders[] = ":brand" . $i;
                             $params[":brand" . $i] = $brand;
                         }
@@ -131,44 +153,47 @@
                         default:
                             $sql .= " ORDER BY rating DESC";
                     }
-                    
                     $query = $pdo->prepare($sql);
                     $query->execute($params);
                     $products = $query->fetchAll(PDO::FETCH_ASSOC);
-
-                    foreach ($products as $product):
-                        $discountPrice = $product['discount_percentage'] 
-                            ? $product['price'] * (1 - $product['discount_percentage'] / 100)
-                            : null;
                     ?>
-                    <div class="swiper-slide product-card-catalog-1" data-description="<?= htmlspecialchars($product['description']) ?>">
-                        <?php if ($product['status'] === 'хит'): ?>
-                        <div class="badge_xit">
-                            <p>Хит</p>
-                        </div>
-                        <?php endif; ?>
-                        <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                        <span><?= htmlspecialchars($product['category']) ?></span>
-                        <p><?= htmlspecialchars($product['name']) ?></p>
-                        <div class="grade">
-                            <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                            <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                        </div>
-                        <div class="price">
-                            <div class="price-values">
-                                <?php if ($discountPrice): ?>
-                                    <p>₽<?= number_format($discountPrice, 2) ?></p>
-                                    <span>₽<?= number_format($product['price'], 2) ?></span>
-                                <?php else: ?>
-                                    <p>₽<?= number_format($product['price'], 2) ?></p>
-                                <?php endif; ?>
+                    <?php if (empty($products)): ?>
+                        <p class="font" style="color: #66B158;">Товары не найдены</p>
+                    <?php else: ?>
+                        <?php foreach ($products as $product):
+                            $discountPrice = $product['discount_percentage'] 
+                                ? $product['price'] * (1 - $product['discount_percentage'] / 100)
+                                : null;
+                        ?>
+                        <div class="swiper-slide product-card-catalog-1" data-description="<?= htmlspecialchars($product['description']) ?>">
+                            <?php if ($product['status'] === 'хит'): ?>
+                            <div class="badge_xit">
+                                <p>Хит</p>
                             </div>
-                            <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                            </button>
+                            <?php endif; ?>
+                            <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                            <span><?= htmlspecialchars($product['category']) ?></span>
+                            <p><?= htmlspecialchars($product['name']) ?></p>
+                            <div class="grade">
+                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
+                                <span>(<?= number_format($product['rating'], 1) ?>)</span>
+                            </div>
+                            <div class="price">
+                                <div class="price-values">
+                                    <?php if ($discountPrice): ?>
+                                        <p>₽<?= number_format($discountPrice, 2) ?></p>
+                                        <span>₽<?= number_format($product['price'], 2) ?></span>
+                                    <?php else: ?>
+                                        <p>₽<?= number_format($product['price'], 2) ?></p>
+                                    <?php endif; ?>
+                                </div>
+                                <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                    <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

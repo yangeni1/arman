@@ -18,6 +18,9 @@
     font-family: "Montserrat";
     src: url("../fonts/Montserrat/Montserrat-Regular.ttf");
 }
+.font{
+    font-family: "Quicksand";
+}
 .container {
     display: flex;
     justify-content: center;

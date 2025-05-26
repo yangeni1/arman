@@ -1136,6 +1136,9 @@ input:focus{
 .card_news_price{
     padding-top: 30px;
 }
+.add-to-favorites-btn{
+    border: none;
+}
 .txt_news{
     padding-right: 29px;
     padding-left: 29px;

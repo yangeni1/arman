@@ -430,9 +430,6 @@ session_start();
                 <div class="news">
                     <div class="txt_preview">
                         <p>Новинки</p>
-                        <div class="btn_news">
-                            <a href="">Все предложения <img src="./media/news/Link.svg" alt=""></a>
-                        </div>
                     </div>
                     <div class="container_news_card">
                         <div class="card_news">

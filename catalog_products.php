@@ -1,529 +1,310 @@
+<?php
+include 'db.php';
+include 'header.php';
+
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+$subcategory_id = isset($_GET['subcategory_id']) ? intval($_GET['subcategory_id']) : null;
+
+// Получаем максимальную цену для текущей категории
+if ($category === 'Все товары') {
+    $maxPriceQuery = $pdo->query("SELECT MAX(price) as max_price FROM products");
+} else {
+    $stmt = $pdo->prepare("SELECT MAX(price) as max_price FROM products WHERE category = ?");
+    $stmt->execute([$category]);
+}
+$categoryMaxPrice = ($category === 'Все товары')
+    ? $pdo->query("SELECT MAX(price) as max_price FROM products")->fetch(PDO::FETCH_ASSOC)['max_price']
+    : $stmt->fetch(PDO::FETCH_ASSOC)['max_price'];
+$categoryMaxPrice = $categoryMaxPrice ?? 1000;
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Арман</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <title><?= htmlspecialchars($category) ?> - Арман</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper @11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <?php
-        include 'db.php';
-        include 'header.php';
-        
-        // Получаем максимальную цену для текущей категории
-        $category = isset($_GET['category']) ? htmlspecialchars($_GET['category']) : 'Все товары';
-        if ($category === 'Все товары') {
-            $maxPriceQuery = $pdo->prepare("SELECT MAX(price) as max_price FROM products");
-            $maxPriceQuery->execute();
-        } else {
-            $maxPriceQuery = $pdo->prepare("SELECT MAX(price) as max_price FROM products WHERE category = :category");
-            $maxPriceQuery->execute([':category' => $category]);
-        }
-        $categoryMaxPrice = $maxPriceQuery->fetch(PDO::FETCH_ASSOC)['max_price'] ?? 1000;
-    ?>
-    <div class="container">
-        <div class="container_main">
-            <div class="head_catalog">
-                <p><?php 
-                    echo $category;
-                ?></p>
-                <div class="filter_price">
-                    <button class="sort-btn active" data-sort="popularity">По популярности</button>
-                    <button class="sort-btn" data-sort="price_asc">По цене Вверх</button>
-                    <button class="sort-btn" data-sort="price_desc">По цене Вниз</button>
-                </div>
-            </div>
-            <div class="container_catalog_filter">
-                <div class="catalog_main_menu_list">
-                    <p>Категории товаров</p>
-                    <div class="catalog_main_menu_list_item">
-                        <a href="catalog_products.php?category=шоколадные конфеты" <?php echo ($category === 'шоколадные конфеты') ? 'class="active"' : ''; ?>>Шоколадные конфеты</a>
-                        <a href="catalog_products.php?category=драже" <?php echo ($category === 'драже') ? 'class="active"' : ''; ?>>Драже</a>
-                        <a href="catalog_products.php?category=карамель" <?php echo ($category === 'карамель') ? 'class="active"' : ''; ?>>Карамель</a>
-                        <a href="catalog_products.php?category=конфеты желейные" <?php echo ($category === 'конфеты желейные') ? 'class="active"' : ''; ?>>Конфеты желейные</a>
-                        <a href="catalog_products.php?category=батончики" <?php echo ($category === 'батончики') ? 'class="active"' : ''; ?>>Батончики</a>
-                        <a href="catalog_products.php?category=ирис, ирисовые конфеты" <?php echo ($category === 'ирис, ирисовые конфеты') ? 'class="active"' : ''; ?>>Ирис</a>
-                        <a href="catalog_products.php?category=леденцы" <?php echo ($category === 'леденцы') ? 'class="active"' : ''; ?>>Леденцы</a>
-                        <a href="catalog_products.php?category=гематоген" <?php echo ($category === 'гематоген') ? 'class="active"' : ''; ?>>Гематоген</a>
-                    </div>
-                    <div class="filter_switch">
-                        <div class="cena_sbros">
-                            <p>Цена</p>
-                            <button onclick="resetPriceOnly()">Сброс</button>
-                        </div>
-                        <div class="inputs">
-                            <input type="number" id="minPrice" placeholder="1" onchange="updateFromInputs()">
-                            <img src="./media/filter/minus.png" alt="">
-                            <input type="number" id="maxPrice" placeholder="0" onchange="updateFromInputs()">
-                        </div>
-                        <div class="polzynok">
-                            <div class="range-slider">
-                                <div class="range-progress"></div>
-                                <input type="range" id="minRange" min="0" max="<?php echo $categoryMaxPrice; ?>" step="1" oninput="updatePriceInputs()">
-                                <input type="range" id="maxRange" min="0" max="<?php echo $categoryMaxPrice; ?>" step="1" oninput="updatePriceInputs()">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="filter_brand">
-                        <p>Бренд</p>
-                        <?php
-                        // Получаем уникальные бренды из базы данных
-                        $brandsSql = "SELECT DISTINCT brand FROM products WHERE category = :category ORDER BY brand";
-                        $brandsQuery = $pdo->prepare($brandsSql);
-                        $brandsQuery->bindParam(':category', $category);
-                        $brandsQuery->execute();
-                        $brands = $brandsQuery->fetchAll(PDO::FETCH_COLUMN);
 
-                        foreach ($brands as $brand):
-                        ?>
+<div class="container">
+    <div class="container_main">
+        <div class="head_catalog">
+            <p><?= htmlspecialchars($category) ?></p>
+            <div class="filter_price">
+                <button class="sort-btn active" data-sort="popularity">По популярности</button>
+                <button class="sort-btn" data-sort="price_asc">По цене Вверх</button>
+                <button class="sort-btn" data-sort="price_desc">По цене Вниз</button>
+            </div>
+        </div>
+        <div class="container_catalog_filter">
+            <div class="catalog_main_menu_list">
+                <p>Категории товаров</p>
+                <div class="catalog_main_menu_list_item">
+                    <?php
+                    // Получаем все уникальные категории
+                    $stmt = $pdo->query("SELECT DISTINCT category FROM products ORDER BY category");
+                    $allCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($allCategories as $cat): ?>
+                        <a href="catalog_products.php?category=<?= urlencode($cat) ?>"
+                           <?= ($cat === $category) ? 'class="active"' : '' ?>>
+                            <?= htmlspecialchars($cat) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Фильтр по подкатегории -->
+                <div class="filter_subcategory">
+                    <p>Подкатегории</p>
+                    <div class="subcategory-buttons">
+                        <a href="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>" 
+                           class="<?= !$subcategory_id ? 'active' : '' ?>">Все</a>
+                        <?php
+                        // Получаем подкатегории (имена) для текущей категории
+                        $sql = "SELECT p.category_id, c.name AS subcategory_name 
+                                FROM products p
+                                JOIN categories c ON p.category_id = c.id
+                                WHERE p.category = ?
+                                GROUP BY p.category_id, c.name";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$category]);
+                        $subcategories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        foreach ($subcategories as $sub): ?>
+                            <a href="catalog_products.php?category=<?= urlencode($category) ?>&subcategory_id=<?= $sub['category_id'] ?>"
+                               class="<?= ($subcategory_id == $sub['category_id']) ? 'active' : '' ?>">
+                                <?= htmlspecialchars($sub['subcategory_name']) ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- Фильтр по цене -->
+                <div class="filter_switch">
+                    <div class="cena_sbros">
+                        <p>Цена</p>
+                        <button onclick="resetPriceOnly()">Сброс</button>
+                    </div>
+                    <div class="inputs">
+                        <input type="number" id="minPrice" placeholder="От" onchange="updateFromInputs()">
+                        <img src="./media/filter/minus.png" alt="">
+                        <input type="number" id="maxPrice" placeholder="До" onchange="updateFromInputs()">
+                    </div>
+                    <div class="polzynok">
+                        <div class="range-slider">
+                            <div class="range-progress"></div>
+                            <input type="range" id="minRange" min="0" max="<?= $categoryMaxPrice ?>" step="1" oninput="updatePriceInputs()">
+                            <input type="range" id="maxRange" min="0" max="<?= $categoryMaxPrice ?>" step="1" oninput="updatePriceInputs()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Фильтр по брендам -->
+                <div class="filter_brand">
+                    <p>Бренд</p>
+                    <?php
+                    $stmt = $pdo->prepare("SELECT DISTINCT brand FROM products WHERE category = ?");
+                    $stmt->execute([$category]);
+                    $brands = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($brands as $brand): ?>
                         <div class="brand_checkbox">
                             <input type="checkbox" id="brand_<?= htmlspecialchars($brand) ?>" value="<?= htmlspecialchars($brand) ?>" onchange="applyFilters()">
                             <p><?= htmlspecialchars($brand) ?></p>
                         </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="btn_sbros_filter">
-                        <button>Сбросить все</button>
-                    </div>
-                    <div class="promotions_banner">
-                        <p>Суперскидки: больше товаров – меньше цен!</p>
-                        <button class="promotion_banner_btn">Купить сейчас<img src="./media/banner/иконка стрелочка.svg" alt=""></button>
-                        <img src="./media/promotions/image 662.png" alt="">
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <div class="card_product_catalog_products">
-                    <?php
-                    $category = isset($_GET['category']) ? $_GET['category'] : '';
-                    $minPrice = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
-                    $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : $categoryMaxPrice;
-                    $selectedBrands = isset($_GET['brands']) ? explode(',', $_GET['brands']) : [];
-                    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-                    $sql = "SELECT * FROM products WHERE 1=1";
-                    $params = [];
-
-                    if (!empty($category) && $category !== 'Все товары') {
-                        $sql .= " AND category = :category";
-                        $params[':category'] = $category;
-                    }
-
-                    if (!empty($search)) {
-                        $sql .= " AND (name LIKE :search1 OR description LIKE :search2)";
-                        $params[':search1'] = '%' . $search . '%';
-                        $params[':search2'] = '%' . $search . '%';
-                    }
-
-                    // Фильтрация по минимальной цене
-                    if ($minPrice > 0) {
-                        $sql .= " AND price >= :min_price";
-                        $params[':min_price'] = $minPrice;
-                    }
-
-                    // Фильтрация по максимальной цене
-                    if ($maxPrice > 0) {
-                        $sql .= " AND price <= :max_price";
-                        $params[':max_price'] = $maxPrice;
-                    }
-
-                    $filteredBrands = array_filter($selectedBrands, function($brand) {
-                        return !empty($brand);
-                    });
-
-                    if (!empty($filteredBrands)) {
-                        $placeholders = [];
-                        $filteredBrands = array_values($filteredBrands); // Reindex array
-                        foreach ($filteredBrands as $i => $brand) {
-                            $placeholders[] = ":brand" . $i;
-                            $params[":brand" . $i] = $brand;
-                        }
-                        $sql .= " AND brand IN (" . implode(',', $placeholders) . ")";
-                    }
-
-                    // Добавляем сортировку
-                    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'popularity';
-                    switch ($sort) {
-                        case 'price_asc':
-                            $sql .= " ORDER BY price ASC";
-                            break;
-                        case 'price_desc':
-                            $sql .= " ORDER BY price DESC";
-                            break;
-                        default:
-                            $sql .= " ORDER BY rating DESC";
-                    }
-                    $query = $pdo->prepare($sql);
-                    $query->execute($params);
-                    $products = $query->fetchAll(PDO::FETCH_ASSOC);
-                    ?>
-                    <?php if (empty($products)): ?>
-                        <p class="font" style="color: #66B158;">Товары не найдены</p>
-                    <?php else: ?>
-                        <?php foreach ($products as $product):
-                            $discountPrice = $product['discount_percentage'] 
-                                ? $product['price'] * (1 - $product['discount_percentage'] / 100)
-                                : null;
-                        ?>
-                        <div class="swiper-slide product-card-catalog-1" data-description="<?= htmlspecialchars($product['description']) ?>">
-                            <?php if ($product['status'] === 'хит'): ?>
-                            <div class="badge_xit">
-                                <p>Хит</p>
-                            </div>
-                            <?php endif; ?>
-                            <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                            <span><?= htmlspecialchars($product['category']) ?></span>
-                            <p><?= htmlspecialchars($product['name']) ?></p>
-                            <div class="price">
-                                <div class="price-values">
-                                    <?php if ($discountPrice): ?>
-                                        <p>₽<?= number_format($discountPrice, 2) ?></p>
-                                        <span>₽<?= number_format($product['price'], 2) ?></span>
-                                    <?php else: ?>
-                                        <p>₽<?= number_format($product['price'], 2) ?></p>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <div class="product-buttons">
-                                            <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                                <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                            </button>
-                                            <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
-                                                <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
-                                            </button>
-                                        </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                <div class="btn_sbros_filter">
+                    <button onclick="resetAllFilters()">Сбросить всё</button>
                 </div>
+            </div>
+
+            <!-- Блок товаров -->
+            <div class="card_product_catalog_products" id="productsContainer">
+                <!-- Здесь будут загружаться товары -->
             </div>
         </div>
     </div>
-    <?php
-        include 'footer.php';
-    ?>
-    <!-- begin scroll -->
-    <button class="sroll" id="scrollToTopBtn"><img src="./media/scroll/scroll.png" alt=""></button>
-    <!-- end scroll -->
+</div>
+
+<?php include 'footer.php'; ?>
     <script src="js/product-modal.js"></script>
-    <script>
-        let updateTimeout;
-        const cardProductCatalog = document.querySelector('.card_product_catalog_products');
-        const minRange = document.getElementById('minRange');
-        const maxRange = document.getElementById('maxRange');
-        const minInput = document.getElementById('minPrice');
-        const maxInput = document.getElementById('maxPrice');
-        const rangeProgress = document.querySelector('.range-progress');
-        const categoryMaxPrice = <?php echo $categoryMaxPrice; ?>;
-        let currentSort = 'popularity'; // Добавляем переменную для текущей сортировки
+    <script src="js/favorites.js"></script>
+<script>
+    let updateTimeout;
+    const cardProductCatalog = document.getElementById('productsContainer');
+    const minRange = document.getElementById('minRange');
+    const maxRange = document.getElementById('maxRange');
+    const minInput = document.getElementById('minPrice');
+    const maxInput = document.getElementById('maxPrice');
+    const rangeProgress = document.querySelector('.range-progress');
+    const categoryMaxPrice = <?= json_encode($categoryMaxPrice) ?>;
+    const selectedCategory = <?= json_encode($category) ?>;
+    let currentSort = 'popularity';
 
-        // Добавляем обработчик для кнопок сортировки
-        document.querySelectorAll('.sort-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                // Убираем активный класс у всех кнопок
-                document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-                // Добавляем активный класс текущей кнопке
-                this.classList.add('active');
-                // Обновляем текущую сортировку
-                currentSort = this.dataset.sort;
-                // Обновляем товары
-                updateProducts();
+    function updateProducts() {
+        const minPrice = parseFloat(minInput.value) || 0;
+        const maxPrice = parseFloat(maxInput.value) || categoryMaxPrice;
+
+        const brandCheckboxes = document.querySelectorAll('.brand_checkbox input[type="checkbox"]');
+        const selectedBrands = Array.from(brandCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        let url = `get_polzunok.php?category=${encodeURIComponent(selectedCategory)}&min_price=${minPrice}&max_price=${maxPrice}&sort=${currentSort}`;
+        if (selectedBrands.length > 0) {
+            url += `&brands=${encodeURIComponent(selectedBrands.join(','))}`;
+        }
+        if (<?= $subcategory_id ?>) {
+            url += `&subcategory_id=<?= $subcategory_id ?>`;
+        }else{
+            url += `&subcategory_id=0`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cardProductCatalog.innerHTML = data.html;
+                }
             });
-        });
+    }
 
-        // Устанавливаем максимальное значение для ползунков
-        minRange.max = categoryMaxPrice;
-        maxRange.max = categoryMaxPrice;
+    function applyFilters() {
+        const minPrice = parseFloat(minInput.value) || 0;
+        const maxPrice = parseFloat(maxInput.value) || categoryMaxPrice;
 
-        function updateFromInputs() {
-            const minValue = parseFloat(minInput.value) || 0;
-            const maxValue = parseFloat(maxInput.value) || categoryMaxPrice;
+        const brandCheckboxes = document.querySelectorAll('.brand_checkbox input[type="checkbox"]');
+        const selectedBrands = Array.from(brandCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
 
-            // Убедимся, что значения не превышают максимальную цену категории
-            if (maxValue > categoryMaxPrice) {
-                maxInput.value = categoryMaxPrice;
-                maxRange.value = categoryMaxPrice;
-            }
-
-            // Убедимся, что минимальное значение не превышает максимальное
-            if (minValue > maxValue) {
-                if (event.target === minInput) {
-                    minInput.value = maxValue;
-                    minRange.value = maxValue;
-                } else {
-                    maxInput.value = minValue;
-                    maxRange.value = minValue;
-                }
-            }
-
-            // Обновляем значения ползунков
-            minRange.value = minValue;
-            maxRange.value = maxValue;
-
-            // Обновляем стиль ползунка
-            const range = maxValue - minValue;
-            const minPercent = (minValue / categoryMaxPrice) * 100;
-            const rangePercent = (range / categoryMaxPrice) * 100;
-            
-            rangeProgress.style.left = `${minPercent}%`;
-            rangeProgress.style.width = `${rangePercent}%`;
-
-            // Очищаем предыдущий таймаут
-            clearTimeout(updateTimeout);
-            
-            // Устанавливаем новый таймаут для обновления
-            updateTimeout = setTimeout(() => {
-                updateProducts();
-            }, 300);
-        }
-
-        function updatePriceInputs() {
-            const minValue = parseFloat(minRange.value) || 0;
-            const maxValue = parseFloat(maxRange.value) || categoryMaxPrice;
-
-            // Убедимся, что значения не превышают максимальную цену категории
-            if (maxValue > categoryMaxPrice) {
-                maxRange.value = categoryMaxPrice;
-                maxInput.value = categoryMaxPrice;
-            }
-
-            // Убедимся, что минимальное значение не превышает максимальное
-            if (minValue > maxValue) {
-                if (minRange === event.target) {
-                    minRange.value = maxValue;
-                    minInput.value = maxValue;
-                } else {
-                    maxRange.value = minValue;
-                    maxInput.value = minValue;
-                }
-            }
-
-            // Обновляем значения в полях ввода
-            minInput.value = minRange.value;
-            maxInput.value = maxRange.value;
-
-            // Обновляем стиль ползунка
-            const range = maxValue - minValue;
-            const minPercent = (minValue / categoryMaxPrice) * 100;
-            const rangePercent = (range / categoryMaxPrice) * 100;
-            
-            rangeProgress.style.left = `${minPercent}%`;
-            rangeProgress.style.width = `${rangePercent}%`;
-            
-            // Очищаем предыдущий таймаут
-            clearTimeout(updateTimeout);
-            
-            // Устанавливаем новый таймаут для обновления
-            updateTimeout = setTimeout(() => {
-                updateProducts();
-            }, 300);
-        }
-
-        function updateProducts() {
-            const minPrice = parseFloat(minInput.value) || 0;
-            const maxPrice = parseFloat(maxInput.value) || categoryMaxPrice;
-
-            // Убедимся, что значения не превышают максимальную цену категории
-            if (maxPrice > categoryMaxPrice) {
-                maxInput.value = categoryMaxPrice;
-                maxRange.value = categoryMaxPrice;
-            }
-
-            const brandCheckboxes = document.querySelectorAll('.brand_checkbox input[type="checkbox"]');
-            const selectedBrands = Array.from(brandCheckboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-
-            // Получаем текущие параметры URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const category = urlParams.get('category') || '';
-
-            // Формируем URL для AJAX запроса с текущей сортировкой
-            let url = `get_polzunok.php?category=${encodeURIComponent(category)}&min_price=${minPrice}&max_price=${maxPrice}&sort=${currentSort}`;
-            if (selectedBrands.length > 0) {
-                url += `&brands=${encodeURIComponent(selectedBrands.join(','))}`;
-            }
-
-            // Отправляем AJAX запрос
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        cardProductCatalog.innerHTML = data.html;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        function applyFilters() {
-            const minPrice = parseFloat(minInput.value) || 0;
-            const maxPrice = parseFloat(maxInput.value) || categoryMaxPrice;
-
-            // Убедимся, что значения не превышают максимальную цену категории
-            if (maxPrice > categoryMaxPrice) {
-                maxInput.value = categoryMaxPrice;
-                maxRange.value = categoryMaxPrice;
-            }
-
-            const brandCheckboxes = document.querySelectorAll('.brand_checkbox input[type="checkbox"]');
-            const selectedBrands = Array.from(brandCheckboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-
-            let url = new URL(window.location.href);
-            url.searchParams.set('min_price', minPrice);
-            url.searchParams.set('max_price', maxPrice);
-            url.searchParams.set('sort', currentSort); // Добавляем текущую сортировку
-            
-            if (selectedBrands.length > 0) {
-                url.searchParams.set('brands', selectedBrands.join(','));
-            } else {
-                url.searchParams.delete('brands');
-            }
-
-            window.location.href = url.toString();
-        }
-
-        function resetPriceOnly() {
-            let url = new URL(window.location.href);
-            url.searchParams.delete('min_price');
-            url.searchParams.delete('max_price');
-            
-            // Сбрасываем значения ползунков и полей ввода
-            minRange.value = 0;
-            maxRange.value = categoryMaxPrice;
-            minInput.value = 0;
-            maxInput.value = categoryMaxPrice;
-            
-            // Обновляем визуальное отображение ползунка
-            rangeProgress.style.left = '0%';
-            rangeProgress.style.width = '100%';
-            
-            window.location.href = url.toString();
-        }
-
-        function resetAllFilters() {
-            let url = new URL(window.location.href);
-            
-            // Сбрасываем все параметры фильтрации
-            url.searchParams.delete('min_price');
-            url.searchParams.delete('max_price');
+        let url = new URL(window.location.href);
+        url.searchParams.set('min_price', minPrice);
+        url.searchParams.set('max_price', maxPrice);
+        url.searchParams.set('sort', currentSort);
+        if (selectedBrands.length > 0) {
+            url.searchParams.set('brands', selectedBrands.join(','));
+        } else {
             url.searchParams.delete('brands');
-            url.searchParams.delete('sort');
-            
-            // Оставляем только категорию
-            const category = url.searchParams.get('category');
-            url = new URL(`${url.origin}${url.pathname}?category=${category}`);
-            
-            // Сбрасываем текущую сортировку
-            currentSort = 'popularity';
-            
-            // Обновляем активную кнопку сортировки
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.sort === 'popularity') {
-                    btn.classList.add('active');
-                }
-            });
-            
-            window.location.href = url.toString();
+        }
+        if (<?= $subcategory_id ?>) {
+            url.searchParams.set('subcategory_id', <?= $subcategory_id ?>);
         }
 
-        // Добавляем обработчики событий для кнопок сброса
-        document.addEventListener('DOMContentLoaded', function() {
-            // Находим кнопки
-            const resetPriceButton = document.querySelector('.cena_sbros button');
-            const resetAllButton = document.querySelector('.btn_sbros_filter button');
-            
-            // Добавляем обработчики
-            if (resetPriceButton) {
-                resetPriceButton.onclick = resetPriceOnly;
+        window.location.href = url.toString();
+    }
+
+    function resetPriceOnly() {
+        minInput.value = 0;
+        maxInput.value = categoryMaxPrice;
+        minRange.value = 0;
+        maxRange.value = categoryMaxPrice;
+        rangeProgress.style.left = '0%';
+        rangeProgress.style.width = '100%';
+        applyFilters();
+    }
+
+    function resetAllFilters() {
+        document.querySelectorAll('.brand_checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+        minInput.value = 0;
+        maxInput.value = categoryMaxPrice;
+        minRange.value = 0;
+        maxRange.value = categoryMaxPrice;
+        rangeProgress.style.left = '0%';
+        rangeProgress.style.width = '100%';
+        applyFilters();
+    }
+
+    function updatePriceInputs() {
+        const minPrice = parseFloat(minRange.value);
+        const maxPrice = parseFloat(maxRange.value);
+
+        minInput.value = minPrice;
+        maxInput.value = maxPrice;
+
+        const range = maxPrice - minPrice;
+        const minPercent = (minPrice / categoryMaxPrice) * 100;
+        const rangePercent = (range / categoryMaxPrice) * 100;
+        rangeProgress.style.left = `${minPercent}%`;
+        rangeProgress.style.width = `${rangePercent}%`;
+
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => updateProducts(), 300);
+    }
+
+    function updateFromInputs() {
+        const minPrice = parseFloat(minInput.value) || 0;
+        const maxPrice = parseFloat(maxInput.value) || categoryMaxPrice;
+
+        if (minPrice > maxPrice) {
+            if (event.target === minInput) {
+                minInput.value = maxPrice;
+                minRange.value = maxPrice;
+            } else {
+                maxInput.value = minPrice;
+                maxRange.value = minPrice;
             }
-            if (resetAllButton) {
-                resetAllButton.onclick = resetAllFilters;
-            }
+        }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const minPrice = parseFloat(urlParams.get('min_price')) || 0;
-            const maxPrice = parseFloat(urlParams.get('max_price')) || categoryMaxPrice;
-            const brands = urlParams.get('brands') ? urlParams.get('brands').split(',') : [];
+        minRange.value = minPrice;
+        maxRange.value = maxPrice;
 
-            minInput.value = minPrice;
-            maxInput.value = maxPrice;
-            minRange.value = minPrice;
-            maxRange.value = maxPrice;
+        const range = maxPrice - minPrice;
+        const minPercent = (minPrice / categoryMaxPrice) * 100;
+        const rangePercent = (range / categoryMaxPrice) * 100;
+        rangeProgress.style.left = `${minPercent}%`;
+        rangeProgress.style.width = `${rangePercent}%`;
 
-            // Устанавливаем начальный стиль ползунка
-            const range = maxPrice - minPrice;
-            const minPercent = (minPrice / categoryMaxPrice) * 100;
-            const rangePercent = (range / categoryMaxPrice) * 100;
-            
-            rangeProgress.style.left = `${minPercent}%`;
-            rangeProgress.style.width = `${rangePercent}%`;
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => updateProducts(), 300);
+    }
 
-            brands.forEach(brand => {
-                const checkbox = document.getElementById(`brand_${brand}`);
-                if (checkbox) checkbox.checked = true;
-            });
+    // Обработчики сортировки
+    document.querySelectorAll('.sort-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            currentSort = this.dataset.sort;
+            updateProducts();
+        });
+    });
 
-            // Устанавливаем начальную сортировку из URL
-            currentSort = urlParams.get('sort') || 'popularity';
-            
-            // Устанавливаем активную кнопку сортировки
+    // Загрузка товаров при открытии
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const minPrice = parseFloat(urlParams.get('min_price')) || 0;
+        const maxPrice = parseFloat(urlParams.get('max_price')) || categoryMaxPrice;
+        const brands = urlParams.get('brands') ? urlParams.get('brands').split(',') : [];
+
+        minInput.value = minPrice;
+        maxInput.value = maxPrice;
+        minRange.value = minPrice;
+        maxRange.value = maxPrice;
+
+        const range = maxPrice - minPrice;
+        const minPercent = (minPrice / categoryMaxPrice) * 100;
+        const rangePercent = (range / categoryMaxPrice) * 100;
+        rangeProgress.style.left = `${minPercent}%`;
+        rangeProgress.style.width = `${rangePercent}%`;
+
+        brands.forEach(brand => {
+            const checkbox = document.getElementById(`brand_${brand}`);
+            if (checkbox) checkbox.checked = true;
+        });
+
+        const sortParam = urlParams.get('sort');
+        if (sortParam) {
+            currentSort = sortParam;
             document.querySelectorAll('.sort-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.dataset.sort === currentSort) {
-                    btn.classList.add('active');
-                }
+                if (btn.dataset.sort === sortParam) btn.classList.add('active');
             });
-        });
+        }
 
-        // кнопка вверх
-        // Получаем кнопку и изображение внутри кнопки
-        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-        const buttonImg = scrollToTopBtn.querySelector('img');
-
-        // Изначально скрываем кнопку
-        scrollToTopBtn.style.display = 'none';
-
-        // Флаг для отслеживания направления скролла
-        let lastScrollTop = 0;
-
-        // Обработчик прокрутки
-        window.addEventListener('scroll', function() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-            // Если прокрутка вниз
-            if (scrollTop > lastScrollTop && scrollTop > 100) { // 100 - это порог, при котором кнопка появляется
-                scrollToTopBtn.style.display = 'block';
-            } else if (scrollTop < lastScrollTop || scrollTop <= 100) { // Кнопка скрывается при скролле вверх
-                scrollToTopBtn.style.display = 'none';
-            }
-
-            // Обновляем значение lastScrollTop
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        });
-
-        // Обработчик клика по кнопке
-        scrollToTopBtn.addEventListener("click", function() {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        });
-
-        // Обработчик наведения на изображение
-        buttonImg.addEventListener('mouseover', function() {
-            buttonImg.src = './media/scroll/scroll-hover.png';
-        });
-
-        // Обработчик ухода мыши с изображения
-        buttonImg.addEventListener('mouseout', function() {
-            buttonImg.src = './media/scroll/scroll.png';
-        });
-    </script>
+        updateProducts();
+    });
+</script>
+<script src="js/cart.js"></script>
 </body>
 </html>

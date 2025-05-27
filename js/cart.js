@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+async function sperma() {
     const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
     addToCartButtons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -95,4 +95,4 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     });
-});
+};

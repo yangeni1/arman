@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,6 +59,7 @@
         }
 
         .about_section {
+            font-family: "Quicksand", sans-serif;
             margin-bottom: 40px;
             padding: 20px;
             background: #FFFFFF;

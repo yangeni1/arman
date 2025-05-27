@@ -51,10 +51,6 @@ foreach ($products as $product):
         <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/sale/default.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
         <span><?= htmlspecialchars($product['category']) ?></span>
         <p><?= htmlspecialchars($product['name']) ?></p>
-        <div class="grade">
-            <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-            <span>(<?= number_format($product['rating'], 1) ?>)</span>
-        </div>
         <div class="price">
             <div class="price-values">
                 <?php if ($discountPrice): ?>
@@ -64,9 +60,14 @@ foreach ($products as $product):
                     <p>₽<?= number_format($product['price'], 2) ?></p>
                 <?php endif; ?>
             </div>
-            <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-            </button>
+                <div class="product-buttons">
+                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                    </button>
+                        <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
+                            <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
+                        </button>
+                </div>
         </div>
     </div>
 <?php endforeach; ?>

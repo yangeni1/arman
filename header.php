@@ -131,11 +131,11 @@ if ($is_admin) {
                             <p>Каталог</p>
                         </a>
                         <div class="btn_menu_header">
-                            <a href="" class="promotions_and_discounts">
+                            <a href="index.php#anchor_promotions" class="promotions_and_discounts">
                                 <img src="./media/header/иконка акции.svg" alt="">
-                                <p>Акция & Скидки</p>
+                                <p>Акции & Скидки</p>
                             </a>
-                            <a href="" class="new_btn_menu_header">
+                            <a href="index.php#anchor_news" class="new_btn_menu_header">
                                 <p>Новинки</p>
                             </a>
                             <a href="delivery.php">
@@ -144,7 +144,7 @@ if ($is_admin) {
                             <a href="about.php">
                                 <p>О нас</p>
                             </a>
-                            <a href="">
+                            <a href="contant.php">
                                 <p>Контакты</p>
                             </a>
                         </div>

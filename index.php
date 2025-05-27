@@ -411,7 +411,7 @@ session_start();
                 <div class="container_promotions">
                     <div class="promotions">
                         <div class="txt_preview">
-                            <p>Акции & скидки</p>
+                            <p  id="anchor_promotions">Акции & скидки</p>
                             <div class="btn_promotions">
                                 <?php foreach ($categories as $category): ?>
                                     <a href="?category=<?= urlencode($category) ?>"
@@ -422,11 +422,14 @@ session_start();
                             </div>
                         </div>
                         <div class="container_promotions_banner_slider">
-                            <div class="promotions_banner">
-                                <p>Суперскидки: больше товаров – меньше цен!</p>
-                                <button class="promotion_banner_btn">Купить сейчас<img src="./media/banner/иконка стрелочка.svg" alt=""></button>
-                                <img src="./media/promotions/image 662.png" alt="">
-                            </div>
+                            
+                        <a href="./catalog.php">
+                                <div class="promotions_banner">
+                                    <p>Суперскидки: больше товаров – меньше цен!</p>
+                                        <button class="promotion_banner_btn">Купить сейчас<img src="./media/banner/иконка стрелочка.svg" alt=""></button>
+                                            <img src="./media/promotions/image 662.png" alt="">
+                                </div>
+                        </a>
                             <div class="container_slider_3">
                                 <div class="swiper-button-prev custom-prev3">
                                     <img src="./media/popular-product/Tabpanel-left.png" alt="Previous">
@@ -487,7 +490,7 @@ session_start();
                 <div class="container_news">
                     <div class="news">
                         <div class="txt_preview">
-                            <p>Новинки</p>
+                            <p id="anchor_news">Новинки</p>
                         </div>
                         <div class="container_news_card">
                             <div class="card_news">

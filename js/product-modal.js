@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <img src="./media/modal/Vector (1).png" alt="">
                                 <p>В корзину</p>
                             </button>
-                            <button class="btn_favorites product-modal-favorite">
+                            <button class="btn_favorites product-modal-favorite add-to-favorites-btn">
                                 <img src="./media/modal/Vector (2).png" alt="">
                             </button>
                         </div>
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalPrice = modal.querySelector('.product-modal-price');
         const modalDescription = modal.querySelector('.product-modal-description');
         const addToCartBtn = modal.querySelector('.product-modal-add-to-cart');
-
+        const favoriteBtn = modal.querySelector('.product-modal-favorite');
         // Заполняем данные товара
         modalImage.src = productData.image;
         modalImage.alt = productData.name;
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Устанавливаем ID товара для кнопки
         addToCartBtn.setAttribute('data-product-id', productData.id);
-
+        favoriteBtn.setAttribute('data-product-id', productData.id);
         // Добавляем обработчик для кнопки "В корзину"
         addToCartBtn.onclick = async function(e) {
             e.preventDefault();

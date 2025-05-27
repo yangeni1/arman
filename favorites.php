@@ -72,7 +72,7 @@ session_start();
             </div>
             <?php else: ?>
             <div class="favorites_main">
-                <h2>Избранные товары</h2>
+                <h2 class="center">Избранные товары</h2>
                 <div class="favorites_products">
                     <?php
                     $sql = "SELECT p.* FROM products p 
@@ -90,8 +90,8 @@ session_start();
                                 ? $product['price'] * (1 - $product['discount_percentage'] / 100)
                                 : null;
                     ?>
-                        <div class="product-card-catalog" data-description="<?= htmlspecialchars($product['description']) ?>">
-                            <button class="remove-from-favorites" data-product-id="<?= $product['id'] ?>">×</button>
+                        <!-- yswydy -->
+                        <div class="swiper-slide product-card-catalog-1" data-description="<?= htmlspecialchars($product['description']) ?>">
                             <?php if ($product['status'] === 'хит'): ?>
                             <div class="badge_xit">
                                 <p>Хит</p>
@@ -100,10 +100,6 @@ session_start();
                             <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                             <span><?= htmlspecialchars($product['category']) ?></span>
                             <p><?= htmlspecialchars($product['name']) ?></p>
-                            <div class="grade">
-                                <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                            </div>
                             <div class="price">
                                 <div class="price-values">
                                     <?php if ($discountPrice): ?>
@@ -113,11 +109,15 @@ session_start();
                                         <p>₽<?= number_format($product['price'], 2) ?></p>
                                     <?php endif; ?>
                                 </div>
+                                
                                 <div class="product-buttons">
-                                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                    </button>
-                                </div>
+                                            <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                                <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                            </button>
+                                            <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
+                                                <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
+                                            </button>
+                                        </div>
                             </div>
                         </div>
                     <?php 

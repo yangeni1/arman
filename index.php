@@ -335,10 +335,6 @@ session_start();
                                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                                <div class="grade">
-                                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="Рейтинг">
-                                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                                </div>
                                                 <div class="price">
                                                     <div class="price-values">
                                                         <?php if ($discountPrice): ?>
@@ -348,9 +344,14 @@ session_start();
                                                             <p>₽<?= number_format($product['price'], 2) ?></p>
                                                         <?php endif; ?>
                                                     </div>
-                                                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                                    </button>
+                                                    <div class="product-buttons">
+                                                        <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                                        </button>
+                                                            <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
+                                                                <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
+                                                            </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -450,10 +451,6 @@ session_start();
                                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/sale/default.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                                                 <span><?= htmlspecialchars($product['category']) ?></span>
                                                 <p><?= htmlspecialchars($product['name']) ?></p>
-                                                <div class="grade">
-                                                    <img src="./media/popular-product/иконка звезда отзывы.svg" alt="">
-                                                    <span>(<?= number_format($product['rating'], 1) ?>)</span>
-                                                </div>
                                                 <div class="price">
                                                     <div class="price-values">
                                                         <?php if ($discountPrice): ?>
@@ -463,9 +460,14 @@ session_start();
                                                             <p>₽<?= number_format($product['price'], 2) ?></p>
                                                         <?php endif; ?>
                                                     </div>
-                                                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                                    </button>
+                                                    <div class="product-buttons">
+                                                        <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                                        </button>
+                                                            <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
+                                                                <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
+                                                            </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -847,6 +849,7 @@ session_start();
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/favorites.js"></script>
 </body>
 
 </html>

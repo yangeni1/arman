@@ -134,6 +134,10 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
             .filter(cb => cb.checked)
             .map(cb => cb.value);
 
+        // Extract search parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search') || '';
+
         let url = `get_polzunok.php?category=${encodeURIComponent(selectedCategory)}&min_price=${minPrice}&max_price=${maxPrice}&sort=${currentSort}`;
         if (selectedBrands.length > 0) {
             url += `&brands=${encodeURIComponent(selectedBrands.join(','))}`;
@@ -142,6 +146,9 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
             url += `&subcategory_id=<?= $subcategory_id ?>`;
         }else{
             url += `&subcategory_id=0`;
+        }
+        if (searchQuery) {
+            url += `&search=${encodeURIComponent(searchQuery)}`;
         }
 
         fetch(url)

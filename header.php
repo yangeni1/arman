@@ -77,9 +77,10 @@ if ($is_admin) {
                                 document.getElementById('search-button').addEventListener('click', function() {
                                     const query = document.getElementById('search-input').value.trim();
                                     if (query) {
-                                        const url = new URL(window.location.origin + '/catalog_products.php');
-                                        url.searchParams.set('search', query,'&subcategory_id=0');
-                                        window.location.href = url.toString();
+                                    const url = new URL(window.location.origin + '/catalog_products.php');
+                                    url.searchParams.set('search', query);
+                                    url.searchParams.set('subcategory_id', '0');
+                                    window.location.href = url.toString();
                                     }
                                 });
                                 document.getElementById('search-input').addEventListener('keydown', function(event) {

@@ -10,6 +10,7 @@ $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 1000;
 $selectedBrands = isset($_GET['brands']) ? explode(',', $_GET['brands']) : [];
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'popularity';
 $subcategory_id = isset($_GET['subcategory_id']) ? intval($_GET['subcategory_id']) : null;
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
     // Базовый SQL-запрос
@@ -48,6 +49,14 @@ try {
         $placeholders = implode(',', array_fill(0, count($selectedBrands), '?'));
         $sql .= " AND p.brand IN ($placeholders)";
         $params = array_merge($params, $selectedBrands);
+    }
+
+    // Фильтр по поисковому запросу
+    if (!empty($search)) {
+        $sql .= " AND (p.name LIKE ? OR p.description LIKE ?)";
+        $searchParam = '%' . $search . '%';
+        $params[] = $searchParam;
+        $params[] = $searchParam;
     }
 
     // Сортировка

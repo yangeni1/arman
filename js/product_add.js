@@ -26,7 +26,7 @@ async function loadOptions(url, selectId) {
         const data = await response.json();
         select.innerHTML = '<option value="">Выберите...</option>';
         data.forEach(item => {
-            select.add(new Option(item.name, item.id));
+            select.add(new Option(item.name, item.name));
         });
     } catch (error) {
         console.error(`Error loading ${url}:`, error);
@@ -150,7 +150,7 @@ function initFormValidation() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const requiredFields = ['status_id', 'category_id', 'brand_id', 'name', 'price', 'quantity'];
+        const requiredFields = ['status', 'category', 'brand', 'name', 'price', 'quantity'];
         let isValid = true;
 
         requiredFields.forEach(fieldId => {
@@ -194,17 +194,20 @@ async function submitProductForm(form) {
         }
 
         const formData = new FormData(form);
+        
+        console.log(formData)
+
         const response = await fetch('/add_product.php', {
             method: 'POST',
             body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.data}`);
 
         const data = await response.json();
         if (data.success) {
-            showMessage('success', `Товар успешно добавлен<br>ID товара: ${data.product_id}<br>ID изображений: ${data.image_ids.join(', ')}`, 8000);
+            showMessage('success', `Товар успешно добавлен<br>ID товара: ${data.product_id}`, 8000);
             resetForm();
         } else {
             throw new Error(data.message || 'Unknown error');

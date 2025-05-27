@@ -113,7 +113,7 @@
                 <label>Изображения товара:</label>
                 <div id="imageUploads">
                     <div class="image-upload-item">
-                        <input type="file" name="images[]" accept="image/*" class="image-input" required>
+                        <input type="file" name="image" accept="image/*" class="image-input" required>
                         <img src="#" alt="Предпросмотр" class="image-preview" style="display: none;">
                         <button type="button" class="remove-image-btn" style="display: none;">×</button>
                         <div class="image-meta">

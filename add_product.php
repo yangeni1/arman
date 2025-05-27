@@ -1,154 +1,85 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Access-Control-Allow-Headers: X-Requested-With, Content-Type");
-header('Content-Type: application/json');
+require_once 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-require_once __DIR__ . '/db.php';
-
-$input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-$files = $_FILES;
-
-// Валидация данных
-$requiredFields = ['status_id', 'category_id', 'brand_id', 'name', 'price', 'quantity'];
-$errors = [];
-
-foreach ($requiredFields as $field) {
-    if (empty($input[$field])) {
-        $errors[] = "Поле $field обязательно для заполнения";
-    }
-}
-
-// Валидация изображений
-if (empty($files['images']['tmp_name'][0])) {
-    $errors[] = "Необходимо загрузить хотя бы одно изображение товара";
-} else {
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-    
-    foreach ($files['images']['tmp_name'] as $index => $tmpName) {
-        if (empty($tmpName)) continue;
-        
-        $mimeType = finfo_file($fileInfo, $tmpName);
-        if (!in_array($mimeType, $allowedTypes)) {
-            $errors[] = "Допустимы только изображения JPG, PNG или GIF";
-            break;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        // Обработка загруженного файла
+        $imagePath = '';
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/products/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid() . '.' . $extension;
+            $targetPath = $uploadDir . $filename;
+            
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
+                $imagePath = $targetPath;
+            }
         }
-        
-        if ($files['images']['size'][$index] > 2 * 1024 * 1024) {
-            $errors[] = "Размер изображения не должен превышать 2MB";
-            break;
-        }
-    }
-}
+       
+        // Подготовка данных товара
+        $product = [
+            'status' => htmlspecialchars(strip_tags($_POST['status_id'])),
+            'discount_percentage' => htmlspecialchars(strip_tags($_POST['discount'])),
+            'category' => htmlspecialchars(strip_tags($_POST['category_id'])),
+            'name' => htmlspecialchars(strip_tags($_POST['name'])),
+            'brand' => htmlspecialchars(strip_tags($_POST['brand_id'])),
+            'rating' => isset($_POST['rating']) ? min(max((float)$_POST['rating'], 0), 5) : null,
+            'price' => round(max((float)$_POST['price'], 0), 2),
+            'description' => htmlspecialchars(strip_tags($_POST['description'])),
+            'image' => $imagePath
+        ];
 
-if (!empty($errors)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => implode("\n", $errors)]);
-    exit;
-}
+        // SQL-запрос для новой структуры таблицы
+        $sql = "INSERT INTO products (
+                    status, discount_percentage, category, name, 
+                    rating, price, brand, description, image
+                ) VALUES (
+                    :status, :discount_percentage, :category, :name, 
+                    :rating, :price,  :brand,  :description, :image
+                )";
 
-// Загрузка изображений
-$uploadDir = __DIR__ . '/uploads/products/';
-if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
-}
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($product);
 
-$uploadedImages = [];
-$mainImageIndex = isset($input['main_image']) ? (int)$input['main_image'] : 0;
+        // Успешный ответ
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true, 
+            'id' => $pdo->lastInsertId(),
+            'image' => $imagePath,
+            'message' => 'Товар успешно добавлен'
+        ]);
+        exit;
 
-foreach ($files['images']['tmp_name'] as $index => $tmpName) {
-    if (empty($tmpName)) continue;
-    
-    $filename = uniqid() . '_' . basename($files['images']['name'][$index]);
-    $targetPath = $uploadDir . $filename;
-    
-    if (move_uploaded_file($tmpName, $targetPath)) {
-        $isMain = ($index === $mainImageIndex) ? 1 : 0;
-        $uploadedImages[] = ['filename' => $filename, 'is_main' => $isMain];
-    } else {
+    } catch (PDOException $e) {
+        // Обработка ошибок базы данных
+        header('Content-Type: application/json');
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Ошибка при сохранении изображения']);
+        echo json_encode([
+            'error' => 'Database error',
+            'message' => $e->getMessage(),
+            'code' => $e->getCode()
+        ]);
+        exit;
+    } catch (Exception $e) {
+        // Обработка других ошибок
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode([
+            'error' => 'Validation error',
+            'message' => $e->getMessage()
+        ]);
         exit;
     }
 }
 
-// Если ни одно изображение не помечено как главное, делаем первое главным
-if (!empty($uploadedImages) && !in_array(1, array_column($uploadedImages, 'is_main'))) {
-    $uploadedImages[0]['is_main'] = 1;
-}
-
-// Сохранение в БД
-try {
-    $pdo->beginTransaction();
-
-    // Добавление товара
-    $stmtProduct = $pdo->prepare("INSERT INTO product 
-        (name, price, category_id, status_id, brand_id, stock_initial, stock_remaining, sale, description) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    
-    $stmtProduct->execute([
-        $input['name'],
-        (float)$input['price'],
-        (int)$input['category_id'],
-        (int)$input['status_id'],
-        (int)$input['brand_id'],
-        (int)$input['quantity'],
-        (int)$input['quantity'],
-        (float)($input['discount'] ?? 0),
-        $input['description'] ?? ''
-    ]);
-    
-    $productId = $pdo->lastInsertId();
-
-    // Добавление изображений
-    $imageIds = [];
-    foreach ($uploadedImages as $image) {
-        $stmtImage = $pdo->prepare("INSERT INTO image (image_url, main_image) VALUES (?, ?)");
-        $stmtImage->execute([$image['filename'], $image['is_main']]);
-        $imageId = $pdo->lastInsertId();
-        $imageIds[] = $imageId;
-
-        // Связь товара с изображением
-        $stmtLink = $pdo->prepare("INSERT INTO product_images (product_id, image_id) VALUES (?, ?)");
-        $stmtLink->execute([$productId, $imageId]);
-    }
-
-    $pdo->commit();
-    
-    echo json_encode([
-        'success' => true, 
-        'message' => 'Товар успешно добавлен',
-        'product_id' => $productId,
-        'image_ids' => $imageIds
-    ]);
-    
-} catch (PDOException $e) {
-    $pdo->rollBack();
-    
-    // Удаление загруженных файлов при ошибке
-    foreach ($uploadedImages as $image) {
-        $filePath = $uploadDir . $image['filename'];
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-    }
-    
-    http_response_code(500);
-    echo json_encode([
-        'success' => false, 
-        'message' => 'Ошибка базы данных',
-        'error_details' => $e->getMessage()
-    ]);
-    
-    error_log("DB Error: " . $e->getMessage());
-}
-?>
+// Ошибка, если запрос не POST
+http_response_code(405);
+echo json_encode([
+    'error' => 'Method not allowed',
+    'message' => 'Используйте метод POST для добавления товара'
+]);

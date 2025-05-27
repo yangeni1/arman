@@ -19,13 +19,13 @@ try {
     }
 
     // Явная проверка таблицы
-    $tableCheck = $pdo->query("SHOW TABLES LIKE 'category'")->fetch();
+    $tableCheck = $pdo->query("SHOW TABLES LIKE 'categories'")->fetch();
     if (!$tableCheck) {
         throw new Exception("Таблица 'category' не существует");
     }
 
     // Получение данных
-    $stmt = $pdo->query("SELECT id, name AS name FROM `category`");
+    $stmt = $pdo->query("SELECT id, name AS name FROM `categories`");
     
     if ($stmt === false) {
         throw new Exception("Ошибка выполнения запроса");

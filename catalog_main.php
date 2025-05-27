@@ -41,7 +41,6 @@
                             <a href="catalog_products.php?category=батончики">Батончики</a>
                             <a href="catalog_products.php?category=ирис, ирисовые конфеты">Ирис</a>
                             <a href="catalog_products.php?category=леденцы">Леденцы</a>
-                            <a href="catalog_products.php?category=гематоген">Гематоген</a>
                         </div>
                     </div>
                 </div>
@@ -55,7 +54,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=шоколадные конфеты">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_pink">
                                                 <img src="./media/recom-card-category/конфеты.png" alt="Шоколадные конфеты">
                                             </div>
                                             <p>Шоколадные конфеты</p>
@@ -65,7 +64,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=драже    ">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_linght_green">
                                                 <img src="./media/catalog_main/драже.png" alt="драже">
                                             </div>
                                             <p>Драже</p>
@@ -75,7 +74,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=карамель">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_violet">
                                                 <img src="./media/catalog_main/карамель.png" alt="карамель">
                                             </div>
                                             <p>Карамель</p>
@@ -85,7 +84,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=конфеты желейные">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_milk">
                                                 <img src="./media/catalog_main/конфеты_желейные.png" alt="Конфеты желейные">
                                             </div>
                                             <p>Конфеты желейные</p>
@@ -95,7 +94,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=батончики">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_pink">
                                                 <img src="./media/catalog_main/батончики.png" alt="Батончики">
                                             </div>
                                             <p>Батончики</p>
@@ -105,7 +104,7 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=ирис, ирисовые конфеты">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_linght_green">
                                                 <img src="./media/catalog_main/ирис.png" alt="Ирис, ирисовые конфеты">
                                             </div>
                                             <p>Ирис</p>
@@ -115,20 +114,10 @@
                                 <div class="swiper-slide card_categori">
                                     <a href="catalog_products.php?category=леденцы">
                                         <div class="card_categories">
-                                            <div class="card_categories_green">
+                                            <div class="card_categories_violet">
                                                 <img src="./media/catalog_main/леденец.png" alt="леденцы">
                                             </div>
                                             <p>Леденцы</p>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="swiper-slide card_categori">
-                                    <a href="catalog_products.php?category=гематоген">
-                                        <div class="card_categories">
-                                            <div class="card_categories_green">
-                                                <img src="./media/catalog_main/гематоген.png" alt="гематоген">
-                                            </div>
-                                            <p>Гематоген</p>
                                         </div>
                                     </a>
                                 </div>
@@ -441,55 +430,6 @@
                         <div class="blina">
                             <?php
                             $sql = "SELECT * FROM products WHERE category = 'леденцы' ORDER BY rating DESC LIMIT 4";
-                            $query = $pdo->prepare($sql);
-                            $query->execute();
-                            $products = $query->fetchAll(PDO::FETCH_ASSOC);
-
-                            foreach ($products as $product):
-                                $discountPrice = $product['discount_percentage'] 
-                                    ? $product['price'] * (1 - $product['discount_percentage'] / 100)
-                                    : null;
-                            ?>
-                            <div class="swiper-slide product-card-catalog">
-                                <?php if ($product['status'] === 'хит'): ?>
-                                <div class="badge_xit">
-                                    <p>Хит</p>
-                                </div>
-                                <?php endif; ?>
-                                <img class="img_product-card" src="<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                                <span><?= htmlspecialchars($product['category']) ?></span>
-                                <p><?= htmlspecialchars($product['name']) ?></p>
-                                <div class="price">
-                                    <div class="price-values">
-                                        <?php if ($discountPrice): ?>
-                                            <p>₽<?= number_format($discountPrice, 2) ?></p>
-                                            <span>₽<?= number_format($product['price'], 2) ?></span>
-                                        <?php else: ?>
-                                            <p>₽<?= number_format($product['price'], 2) ?></p>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="product-buttons">
-                                        <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                        </button>
-                                        <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
-                                            <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="container_products_catalog">
-                        <div class="container_products_catalog_title">
-                            <a href="catalog_products.php?category=гематоген">Гематоген</a>
-                            <a href="catalog_products.php?category=гематоген">></a>
-                        </div>
-                        <div class="blina">
-                            <?php
-                            $sql = "SELECT * FROM products WHERE category = 'гематоген' ORDER BY rating DESC LIMIT 4";
                             $query = $pdo->prepare($sql);
                             $query->execute();
                             $products = $query->fetchAll(PDO::FETCH_ASSOC);

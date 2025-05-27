@@ -78,7 +78,7 @@ if ($is_admin) {
                                     const query = document.getElementById('search-input').value.trim();
                                     if (query) {
                                         const url = new URL(window.location.origin + '/catalog_products.php');
-                                        url.searchParams.set('search', query);
+                                        url.searchParams.set('search', query,'&subcategory_id=0');
                                         window.location.href = url.toString();
                                     }
                                 });

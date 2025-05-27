@@ -18,7 +18,7 @@
                     <p>Все категории</p>
                 </div>
                 <div class="container_card_catalog">
-                <a class="card_catalog" id="card_1" href="catalog_main.php">
+                <a class="card_catalog" id="card_1" href="catalog_products.php?category=Конфеты&subcategory_id=0">
                     <p>Конфеты</p>
                     <img src="./media/catalog_card_image/Candies.png" alt="">
                 </a>

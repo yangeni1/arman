@@ -41,23 +41,7 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
             <div class="catalog_main_menu_list">
                 <p>Категории товаров</p>
                 <div class="catalog_main_menu_list_item">
-                    <?php
-                    // Получаем все уникальные категории
-                    $stmt = $pdo->query("SELECT DISTINCT category FROM products ORDER BY category");
-                    $allCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
-                    foreach ($allCategories as $cat): ?>
-                        <a href="catalog_products.php?category=<?= urlencode($cat) ?>"
-                           <?= ($cat === $category) ? 'class="active"' : '' ?>>
-                            <?= htmlspecialchars($cat) ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-
-                <!-- Фильтр по подкатегории -->
-                <div class="filter_subcategory">
-                    <p>Подкатегории</p>
-                    <div class="subcategory-buttons">
-                        <a href="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>" 
+                <a href="catalog_products.php?category=<?= urlencode($category) ?>&subcategory_id=0"
                            class="<?= !$subcategory_id ? 'active' : '' ?>">Все</a>
                         <?php
                         // Получаем подкатегории (имена) для текущей категории
@@ -76,7 +60,6 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
                                 <?= htmlspecialchars($sub['subcategory_name']) ?>
                             </a>
                         <?php endforeach; ?>
-                    </div>
                 </div>
 
                 <!-- Фильтр по цене -->

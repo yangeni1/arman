@@ -58,7 +58,7 @@
                     <p>Соки, напитки, вода</p>
                     <img src="./media/catalog_card_image/Juices.png" alt="">
                 </a>
-                <a class="card_catalog" id="card_11" href="#">
+                <a class="card_catalog" id="card_11" href="catalog_products.php?category=Чай&subcategory_id=0">
                     <p>Чай, кофе</p>
                     <img src="./media/catalog_card_image/tea.png" alt="">
                 </a>

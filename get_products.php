@@ -56,7 +56,7 @@ foreach ($products as $product):
         <?php endif; ?>
         
         <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-        <span><?= htmlspecialchars($product['category_id'] ?? 'Без категории') ?></span>
+        <span><?= htmlspecialchars($product['category']) ?></span>
         <p><?= htmlspecialchars($product['name']) ?></p>
         <div class="price">
             <div class="price-values">
@@ -67,14 +67,9 @@ foreach ($products as $product):
                     <p>₽<?= number_format($product['price'], 2) ?></p>
                 <?php endif; ?>
             </div>
-            <div class="product-buttons">
-                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
-                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                    </button>
-                        <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
-                            <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
-                        </button>
-                </div>
+            <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+            </button>
         </div>
     </div>
 <?php endforeach; ?>

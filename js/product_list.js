@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
             html += `
                 <div class="product-card" data-id="${product.id}">
                     <div class="product-image-container">
-                        <img src="${product.image_url}" 
+                        <img src="${product.image}" 
                              class="product-image"
                              alt="${product.name}"
                              onerror="this.src='/uploads/products/default-product.jpg'; this.onerror=null;">
@@ -53,13 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="product-info">
                         <h3 class="product-title">${product.name}</h3>
                         <div class="product-meta">
-                            <span class="product-category">${product.category_name}</span>
-                            <span class="product-brand">${product.brand_name}</span>
+                            <span class="product-category">${product.category}</span>
+                            <span class="product-brand">${product.brand}</span>
                         </div>
                         <div class="product-price">${parseFloat(product.price).toFixed(2)} ₽</div>
                     </div>
                     <div class="actions">
-                        <a href="edit_product.php?id=${product.id}" class="btn btn-edit">Редактировать</a>
+                        <a href="/api/edit_product.php?id=${product.id}" class="btn btn-edit">Редактировать</a>
                         <button class="btn btn-delete delete-product" data-id="${product.id}">Удалить</button>
                     </div>
                 </div>

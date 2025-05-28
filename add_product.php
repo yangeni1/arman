@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status' => htmlspecialchars(strip_tags($_POST['status_id'])),
             'discount_percentage' => htmlspecialchars(strip_tags($_POST['discount'])),
             'category' => htmlspecialchars(strip_tags($_POST['category_id'])),
+            'category_id' => htmlspecialchars(strip_tags($_POST['categories'])),
             'name' => htmlspecialchars(strip_tags($_POST['name'])),
             'brand' => htmlspecialchars(strip_tags($_POST['brand_id'])),
-            'rating' => isset($_POST['rating']) ? min(max((float)$_POST['rating'], 0), 5) : null,
             'price' => round(max((float)$_POST['price'], 0), 2),
             'description' => htmlspecialchars(strip_tags($_POST['description'])),
             'image' => $imagePath
@@ -35,11 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // SQL-запрос для новой структуры таблицы
         $sql = "INSERT INTO products (
-                    status, discount_percentage, category, name, 
-                    rating, price, brand, description, image
+                    status, discount_percentage, category, name, category_id, 
+                     price, brand, description, image
                 ) VALUES (
-                    :status, :discount_percentage, :category, :name, 
-                    :rating, :price,  :brand,  :description, :image
+                    :status, :discount_percentage, :category, :name, :category_id,
+                     :price,  :brand,  :description, :image
                 )";
 
         $stmt = $pdo->prepare($sql);
@@ -62,7 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'error' => 'Database error',
             'message' => $e->getMessage(),
-            'code' => $e->getCode()
+            'code' => $e->getCode(),
+              'query' => $sql ?? null, // Добавляем запрос для отладки
+            'params' => $product ?? null // Добавляем параметры для отладки
         ]);
         exit;
     } catch (Exception $e) {

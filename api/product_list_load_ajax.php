@@ -3,20 +3,22 @@ require_once '../db.php';
 
 try {
     $stmt = $pdo->query("
-        SELECT p.*, 
-               c.name as category_name, 
-               b.name as brand_name, 
-               s.status as status_name,
-               (SELECT CONCAT('/uploads/products/', i.image_url)
-                FROM product_images pi
-                JOIN image i ON pi.image_id = i.id
-                WHERE pi.product_id = p.id AND i.main_image = 1
-                LIMIT 1) AS image_url
-        FROM product p
-        LEFT JOIN category c ON p.category_id = c.id
-        LEFT JOIN brand b ON p.brand_id = b.id
-        LEFT JOIN status s ON p.status_id = s.id
-        ORDER BY p.id DESC
+  SELECT 
+    id,
+    name,
+    description,
+    price,
+    discount_percentage,
+    status, -- или замени на NULL, если не нужен
+    category,
+    category_id,
+    brand, -- или замени на NULL, если не нужен
+    image,
+    created_at
+FROM 
+    products
+ORDER BY 
+    id DESC;
     ");
 
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);

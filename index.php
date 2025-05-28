@@ -40,7 +40,7 @@ session_start();
                         </div>
                         <div class="swiper-slide">
                             <img src="./media/banner-slider/Баннер-слайдер_4.png" alt="">
-                            <a href="index.php#anchor_promotions" class="btn_slider fiol">Все акции и спецпредложения</a>
+                            <a href="" class="btn_slider fiol">Все акции и спецпредложения</a>
                         </div>
                     </div>
                     <!-- If we need pagination -->
@@ -102,7 +102,7 @@ session_start();
                             <p>Шоколад</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Чай, кофе&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_linght_green">
                             <img src="./media/recom-card-category/чай.png" alt="">
                             <p>Чай</p>
@@ -114,31 +114,31 @@ session_start();
                             <p>Восточный сладости</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Специи, приправы&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_violet">
                             <img src="./media/recom-card-category/специи.png" alt="">
                             <p>Специи</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Вафли&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_green">
                             <img src="./media/recom-card-category/вафли.png" alt="">
                             <p>Вафли</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Печенье&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_pink">
                             <img src="./media/recom-card-category/печенье.png" alt="">
                             <p>Печенье</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Пряники&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_milk">
                             <img src="./media/recom-card-category/пряники.png" alt="">
                             <p>Пряники</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?category=Консервация&subcategory_id=0">
+                    <a href="">
                         <div class="card_categories_linght_green">
                             <img src="./media/recom-card-category/консервы.png" alt="">
                             <p>Консервы</p>
@@ -236,7 +236,7 @@ session_start();
                             <?php foreach ($categories as $category): ?>
                                 <a href="?category=<?= urlencode($category) ?>"
                                     class="<?= $category === $selectedCategory ? 'active' : '' ?>">
-                                    <?= htmlspecialchars($category ?? '', ENT_QUOTES, 'UTF-8') ?>
+                                    <?= htmlspecialchars($category) ?>
                                 </a>
                             <?php endforeach; ?>
                         </div>
@@ -257,7 +257,7 @@ session_start();
                                             ? $product['price'] * (1 - $product['discount_percentage'] / 100)
                                             : null;
                                     ?>
-                                        <div class="swiper-slide product-card" data-name="<?= htmlspecialchars($product['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" data-description="<?= htmlspecialchars($product['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                        <div class="swiper-slide product-card" data-name="<?= htmlspecialchars($product['name']) ?>" data-description="<?= htmlspecialchars($product['description']) ?>">
                                             <?php if ($product['status'] == 'хит'): ?>
                                                 <div class="badge_xit">
                                                     <p>Хит</p>
@@ -276,9 +276,9 @@ session_start();
                                                 </div>
                                             <?php endif; ?>
 
-                                        <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($product['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                                        <span><?= htmlspecialchars($product['category_id'] ?? 'Без категории', ENT_QUOTES, 'UTF-8') ?></span>
-                                            <p><?= htmlspecialchars($product['name'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                                            <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                                            <span><?= htmlspecialchars($product['category']) ?></span>
+                                            <p><?= htmlspecialchars($product['name']) ?></p>
                                             <div class="price">
                                                 <div class="price-values">
                                                     <?php if ($discountPrice): ?>
@@ -360,7 +360,7 @@ session_start();
                                 <?php foreach ($categories as $category): ?>
                                     <a href="?category=<?= urlencode($category) ?>"
                                         class="<?= $category === $selectedCategory ? 'active' : '' ?>">
-<?= htmlspecialchars($category ?? '', ENT_QUOTES, 'UTF-8') ?>
+                                        <?= htmlspecialchars($category) ?>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
@@ -396,7 +396,7 @@ session_start();
                                                 <?php endif; ?>
 
                                                 <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/sale/default.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                                                <span><?= htmlspecialchars($product['category_id']) ?? 'Без категории' ?></span>
+                                                <span><?= htmlspecialchars($product['category']) ?></span>
                                                 <p><?= htmlspecialchars($product['name']) ?></p>
                                                 <div class="price">
                                                     <div class="price-values">
@@ -702,5 +702,4 @@ session_start();
     <script src="js/cart.js"></script>
 </body>
 
-</html>
 </html>

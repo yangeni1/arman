@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Загрузка выпадающих списков
     loadOptions('/api/get_statuses.php', 'status_id');
-    loadOptions('/api/get_categories.php', 'category_id');
+    loadOptions('/api/get_categories.php', 'categories');
     loadOptions('/api/get_brands.php', 'brand_id');
     
     // Инициализация загрузки изображений

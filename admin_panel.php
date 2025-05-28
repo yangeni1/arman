@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить товар</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="./css/admin_panel.css">
     <link rel="stylesheet" href="./css/adminpanel_header.css">
 </head>
+
 <body>
-    <?php 
-        include 'header_adminpanel.php'
+    <?php
+    include 'header_adminpanel.php'
     ?>
     <!-- Добавление категорий -->
     <div class="container buttom ">
@@ -22,7 +24,7 @@
                         <label for="category_name">Название категории:</label>
                         <input type="text" id="category_name" name="category_name" required maxlength="300">
                     </div>
-                    <button type="submit">Добавить категорию</button>
+                    <button type="submit">Добавить подкатегорию</button>
                 </form>
                 <div id="categoryResponseMessage"></div>
             </div>
@@ -68,13 +70,37 @@
                     <option value="">Выберите статус</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="category_id">Категория:</label>
                 <select id="category_id" name="category_id" required>
                     <option value="">Выберите категорию</option>
+                    <option value="Вафли">Вафли</option>
+                    <option value="Печенье">Печенье</option>
+                    <option value="Шоколад, шоколадные пасты">Шоколад, шоколадные пасты</option>
+                    <option value="Пастила, мармелад">Пастила, мармелад</option>
+                    <option value="Пряники">Пряники</option>
+                    <option value="Баранки, сушки">Баранки, сушки</option>
+                    <option value="Пирожные, кексы">Пирожные, кексы</option>
+                    <option value="Выпечка">Выпечка</option>
+                    <option value="Соки, напитки">Соки, напитки</option>
+                    <option value="Чай, кофе">Чай, кофе</option>
+                    <option value="Специи, приправы">Специи, приправы</option>
+                    <option value="Детские товары">Детские товары</option>
+                    <option value="Праздничный ассортимент">Праздничный ассортимент</option>
+                    <option value="Консервация">Консервация</option>
+                    <option value="Макаронные изделия, крупы">Макаронные изделия, крупы</option>
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="categories">Подкатегория:</label>
+                <select id="categories" name="categories" required>
+                    <option value="">Выберите подкатегорию</option>
+                </select>
+            </div>
+
+
 
             <div class="form-group">
                 <label for="brand_id">Бренд:</label>
@@ -93,22 +119,22 @@
                 <label for="name">Название:</label>
                 <input type="text" id="name" name="name" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="price">Цена:</label>
                 <input type="number" id="price" name="price" step="0.01" min="0.01" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="quantity">Количество:</label>
                 <input type="number" id="quantity" name="quantity" min="0" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="description">Описание:</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
-            
+
             <div class="form-group">
                 <label>Изображения товара:</label>
                 <div id="imageUploads">
@@ -129,7 +155,7 @@
 
             <button type="submit">Добавить товар</button>
         </form>
-        
+
         <div id="responseMessage"></div>
     </div>
     <script src="js/category_add.js"></script>
@@ -137,4 +163,5 @@
     <script src="js/brand_add.js"></script>
     <script src="js/product_add.js"></script>
 </body>
+
 </html>

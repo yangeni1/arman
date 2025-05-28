@@ -58,10 +58,6 @@ foreach ($products as $product):
         <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
         <span><?= htmlspecialchars($product['category']) ?></span>
         <p><?= htmlspecialchars($product['name']) ?></p>
-        <div class="grade">
-            <img src="./media/popular-product/иконка звезда отзывы.svg" alt="Рейтинг">
-            <span>(<?= number_format($product['rating'], 1) ?>)</span>
-        </div>
         <div class="price">
             <div class="price-values">
                 <?php if ($discountPrice): ?>

@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const field = btn.dataset.field;
             const value = form.querySelector(`[name="${field}"]`).value;
 
-            fetch('api/update_field_edit_product.php', {
+            fetch('/api/update_field_edit_product.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ productId, field, value })
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(form);
         formData.append('productId', productId);
 
-        fetch('api/save_all_edit_product.php', {
+        fetch('/api/save_all_edit_product.php', {
             method: 'POST',
             body: formData
         }).then(res => res.json())
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('image', file);
             formData.append('imageId', imageId);
 
-            fetch('api/update_image_edit_product.php', {
+            fetch('update_image_edit_product.php', {
                 method: 'POST',
                 body: formData
             }).then(res => res.json())
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const imageContainer = this.closest('[data-image-id]');
             const imageId = imageContainer.dataset.imageId;
 
-            fetch('api/set_main_image_edit_product.php', {
+            fetch('/set_main_image_edit_product.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ productId, imageId })

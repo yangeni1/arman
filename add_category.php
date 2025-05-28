@@ -16,7 +16,7 @@ try {
 
     $name = trim(htmlspecialchars($_POST['category_name']));
     
-    $stmt = $pdo->prepare("INSERT INTO category (name) VALUES (?)");
+    $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (?)");
     $stmt->execute([$name]);
     
     echo json_encode([

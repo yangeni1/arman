@@ -373,7 +373,7 @@ session_start();
             padding-left: 14px;
             border: 1px solid #EAEAEA;
             border-radius: 5px;
-            margin-bottom: 17px;
+            margin-bottom: 10px;
             box-sizing: border-box;
         }
         .order-form a{
@@ -524,7 +524,7 @@ session_start();
                                 <p><a href="my_adress_view.php">Добавить новый адрес</a></p>
                                 <label for="phone">Номер телефона:</label>
                                 <input type="text" name="phone" id="phone" pattern="^\+7\(\d{3}\) \d{3} \d{2}-\d{2}$" maxlength="17" placeholder="+7(999) 999 99-99" required>
-                                <button type="submit" name="place_order" class="checkout-btn">Оформить заказ</button>
+                                <button type="submit" name="place_order" class="login-button">Оформить заказ</button>
                             </form>
                         <?php endif; ?>
                     <?php endif; ?>

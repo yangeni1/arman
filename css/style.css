@@ -25,9 +25,12 @@ a{
     font-family: "Quicksand";
 }
 .center{
-    font-family: "Quicksand";
+    font-family: "Quicksand", sans-serif;
     display: table;
     margin: 20px auto;
+    color: #253D4E;
+    font-size: 24px;
+    font-weight: 600;
 }
 .basket_main {
     margin-top: 98px;
@@ -265,8 +268,14 @@ form input {
     cursor: pointer;
     margin-top: 27px;
     margin-bottom: 55px;
+    transition: all 0.3s ease;
 }
-
+.login-button:hover {
+    background: #4A8A52;
+}
+.reg-button:hover {
+    background: #4A8A52;
+}
 .forgot-password {
     text-align: right;
     margin-top: 5px;
@@ -1825,7 +1834,18 @@ input:focus{
     font-weight: 700;
     margin-bottom: 30px;
 }
-
+.profile-container h2 {
+    color: #253D4E;
+    font-family: "Quicksand", sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+.order-total {
+    color: #253D4E;
+    font-family: "Quicksand", sans-serif;
+    margin-top: 10px;
+}
 .profile-info {
     margin-bottom: 40px;
 }
@@ -2173,6 +2193,35 @@ input:focus{
     color: #ADADAD;
 }
 .product-card-catalog-1>p{
+    word-break: break-all;
+    margin-top: 16px;
+    margin-left: 21px;
+    margin-right: 21px;
+    width: 220px;
+    height: 49px;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #253D4E;
+}
+.product-card-catalog-2{
+    margin-bottom: 48px;
+    margin-right: 39px;
+    border-radius: 15px;
+    border: 1px solid #ECECEC;
+    width: 262px !important;
+    height: 530px !important;
+    cursor: pointer;
+}
+.product-card-catalog-2>span{
+    word-break: break-all;
+    margin-left: 21px;
+    margin-right: 21px;
+    font-family: "Lato";
+    font-size: 14px;
+    color: #ADADAD;
+}
+.product-card-catalog-2>p{
     word-break: break-all;
     margin-top: 16px;
     margin-left: 21px;

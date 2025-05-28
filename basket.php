@@ -360,6 +360,26 @@ session_start();
                 text-align: center;
             }
         }
+        .order-form{
+            display: table;
+            margin: 0 auto;
+            width: 310px;
+            font-family: "Quicksand", sans-serif;
+        }
+        .order-form select{
+            width: 308px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            padding-left: 14px;
+            border: 1px solid #EAEAEA;
+            border-radius: 5px;
+            margin-bottom: 17px;
+            box-sizing: border-box;
+        }
+        .order-form a{
+            font-size: 14px;
+            color: #66B158;
+        }
     </style>
 </head>
 <body>
@@ -391,52 +411,122 @@ session_start();
                             <p>Ваша корзина пуста</p>
                         </div>
                     <?php else: ?>
-                        <div class="basket_items">
-                            <?php 
-                            $total = 0;
-                            foreach ($cart_items as $item): 
-                                $price = $item['discount_percentage'] 
-                                    ? $item['price'] * (1 - $item['discount_percentage'] / 100)
-                                    : $item['price'];
-                                $item_total = $price * $item['quantity'];
-                                $total += $item_total;
-                            ?>
-                                <div class="basket_item" data-cart-id="<?= $item['id'] ?>">
-                                    <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
-                                    <div class="basket_item_info">
-                                        <h3><?= htmlspecialchars($item['name']) ?></h3>
-                                        <div class="basket_item_price">
-                                            <?php if ($item['discount_percentage']): ?>
-                                                <span class="price">₽<?= number_format($price, 2) ?></span>
-                                                <span class="old-price">₽<?= number_format($item['price'], 2) ?></span>
-                                            <?php else: ?>
-                                                <span class="price">₽<?= number_format($price, 2) ?></span>
-                                            <?php endif; ?>
+                        <?php
+                        $order_success = false;
+                        $error_message = '';
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
+                            // Validate phone number format
+                            $phone = trim($_POST['phone']);
+                            $address_id = (int)$_POST['address_id'];
+                            if (!preg_match('/^\+7\(\d{3}\) \d{3} \d{2}-\d{2}$/', $phone)) {
+                                $error_message = 'Неверный формат номера телефона. Используйте +7(xxx) xxx xx-xx.';
+                            } else {
+                                // Get address string from DB
+                                $stmt = $pdo->prepare('SELECT adress FROM adress WHERE id = ? AND user_id = ?');
+                                $stmt->execute([$address_id, $_SESSION['user_id']]);
+                                $address_row = $stmt->fetch();
+                                if (!$address_row) {
+                                    $error_message = 'Выбранный адрес не найден.';
+                                } else {
+                                    $address = $address_row['adress'];
+                                    // Insert orders for each cart item
+                                    $pdo->beginTransaction();
+                                    try {
+                                        // Get status id for 'new'
+                                        // Use integer status 0 for new orders as per user feedback
+                                        $statusId = 0;
+
+                                        $now = date('Y-m-d H:i:s');
+                                        foreach ($cart_items as $item) {
+                                            $stmt = $pdo->prepare('INSERT INTO orders (user_id, product_id, quantity, datetime, status, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                                            $stmt->execute([
+                                                $_SESSION['user_id'],
+                                                $item['product_id'],
+                                                $item['quantity'],
+                                                $now,
+                                                $statusId,
+                                                $address,
+                                                $phone
+                                            ]);
+                                        }
+                                        // Clear cart
+                                        $stmt = $pdo->prepare('DELETE FROM cart WHERE user_id = ?');
+                                        $stmt->execute([$_SESSION['user_id']]);
+                                        $pdo->commit();
+                                        $order_success = true;
+                                    } catch (Exception $e) {
+                                        $pdo->rollBack();
+                                        $error_message = 'Ошибка при оформлении заказа. Попробуйте позже. Ошибка: ' . $e->getMessage();
+                                    }
+                                }
+                            }
+                        }
+                        ?>
+                        <?php if ($order_success): ?>
+                            <div class="basket_main_txt">
+                                <p>Заказ оформлен! Оплата доступна при получении. С вами свяжутся для уточнения заказа.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="basket_items<?= $order_success ? ' hidden' : '' ?>">
+                                <?php 
+                                $total = 0;
+                                foreach ($cart_items as $item): 
+                                    $price = $item['discount_percentage'] 
+                                        ? $item['price'] * (1 - $item['discount_percentage'] / 100)
+                                        : $item['price'];
+                                    $item_total = $price * $item['quantity'];
+                                    $total += $item_total;
+                                ?>
+                                    <div class="basket_item" data-cart-id="<?= $item['id'] ?>">
+                                        <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
+                                        <div class="basket_item_info">
+                                            <h3><?= htmlspecialchars($item['name']) ?></h3>
+                                            <div class="basket_item_price">
+                                                <?php if ($item['discount_percentage']): ?>
+                                                    <span class="price">₽<?= number_format($price, 2) ?></span>
+                                                    <span class="old-price">₽<?= number_format($item['price'], 2) ?></span>
+                                                <?php else: ?>
+                                                    <span class="price">₽<?= number_format($price, 2) ?></span>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
+                                        <div class="basket_item_quantity">
+                                            <button class="quantity-btn minus">-</button>
+                                            <input type="number" value="<?= $item['quantity'] ?>" min="1" readonly>
+                                            <button class="quantity-btn plus">+</button>
+                                        </div>
+                                        <div class="basket_item_total">
+                                            ₽<?= number_format($item_total, 2) ?>
+                                        </div>
+                                        <button class="remove-item">×</button>
                                     </div>
-                                    <div class="basket_item_quantity">
-                                        <button class="quantity-btn minus">-</button>
-                                        <input type="number" value="<?= $item['quantity'] ?>" min="1" readonly>
-                                        <button class="quantity-btn plus">+</button>
-                                    </div>
-                                    <div class="basket_item_total">
-                                        ₽<?= number_format($item_total, 2) ?>
-                                    </div>
-                                    <button class="remove-item">×</button>
+                                <?php endforeach; ?>
+                                <div class="basket_total">
+                                    <p>Итого: <span>₽<?= number_format($total, 2) ?></span></p>
                                 </div>
-                            <?php endforeach; ?>
-                            <div class="basket_total">
-                                <p>Итого: <span>₽<?= number_format($total, 2) ?></span></p>
-                                <button class="checkout-btn" id="checkoutBtn">Оформить заказ</button>
                             </div>
-                        </div>
-                        <div class="order-processing">
-                            <div class="processing-icon"></div>
-                            <p class="processing-text">Мы собираем ваш заказ</p>
-                            <div class="payment-info">
-                                Оплата заказа возможна по карте и наличными
-                            </div>
-                        </div>
+                            <form method="post" class="order-form" style="max-width: 600px; margin-top: 20px;">
+                                <?php if ($error_message): ?>
+                                    <p style="color: red; font-weight: bold;"><?= htmlspecialchars($error_message) ?></p>
+                                <?php endif; ?>
+                                <label for="address_id">Выберите адрес доставки:</label>
+                                <select name="address_id" id="address_id" required>
+                                    <option value="">Выберите адрес</option>
+                                    <?php
+                                    $stmt = $pdo->prepare('SELECT id, adress FROM adress WHERE user_id = ?');
+                                    $stmt->execute([$_SESSION['user_id']]);
+                                    $user_addresses = $stmt->fetchAll();
+                                    foreach ($user_addresses as $addr):
+                                    ?>
+                                        <option value="<?= $addr['id'] ?>"><?= htmlspecialchars($addr['adress']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p><a href="my_adress_view.php">Добавить новый адрес</a></p>
+                                <label for="phone">Номер телефона:</label>
+                                <input type="text" name="phone" id="phone" pattern="^\+7\(\d{3}\) \d{3} \d{2}-\d{2}$" maxlength="17" placeholder="+7(999) 999 99-99" required>
+                                <button type="submit" name="place_order" class="checkout-btn">Оформить заказ</button>
+                            </form>
+                        <?php endif; ?>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

@@ -190,9 +190,7 @@ if ($is_admin) {
                                 <img src="./media/popup/1.png" alt="Показать пароль">
                             </button>
                         </div>
-                        <div class="forgot-password">
-                            <a href="/forgot-password">Забыли пароль?</a>
-                        </div>
+                       
                         <button type="submit" class="login-button">Войти</button>
                     </div>
                 </form>

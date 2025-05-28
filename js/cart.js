@@ -1,15 +1,6 @@
-async function sperma() {
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const productId = this.getAttribute('data-product-id');
-            console.log('Adding to cart product ID:', productId);
-
-            // Проверяем авторизацию пользователя
-            fetch('check_auth.php')
+console.log('cart');
+async function togglecart(productId, button) {
+    fetch('check_auth.php')
                 .then(response => response.json())
                 .then(data => {
                     if (!data.authenticated) {
@@ -93,6 +84,32 @@ async function sperma() {
                         setTimeout(() => errorNotification.remove(), 500);
                     }, 3000);
                 });
+};
+
+function addToCart() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    console.log(addToCartButtons);
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const productId = this.getAttribute('data-product-id');
+            togglecart(productId, this);
         });
     });
 };
+addToCart();
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.addedNodes.length) {
+            addToCart();
+        }
+    });
+});
+
+// Наблюдаем за изменениями в контейнерах с карточками
+const containers = document.querySelectorAll('.card_product_catalog_products, .blina, .swiper-wrapper, .favorites_products');
+containers.forEach(container => {
+    observer.observe(container, { childList: true, subtree: true });
+});

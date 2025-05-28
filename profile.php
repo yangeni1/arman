@@ -40,13 +40,16 @@ $user = $stmt->fetch();
                     </div>
                 </div>
                 <div class="profile-menu">
-                    <a href="#" class="profile-menu-item">Мои заказы</a>
-                    <a href="#" class="profile-menu-item">Мои адреса</a>
-                    <a href="#" class="profile-menu-item">Настройки профиля</a>
+                    <a href="my_orders_view.php" class="profile-menu-item">Мои заказы</a>
+                    <a href="my_adress_view.php" class="profile-menu-item">Мои адреса</a>
+                    <a href="setting_profile_view.php" class="profile-menu-item">Настройки профиля</a>
                     <a href="logout.php" class="profile-menu-item">Выйти</a>
                 </div>
             </div>
         </div>
     </div>
+    <?php
+        include 'footer.php';
+    ?>
 </body>
 </html> 

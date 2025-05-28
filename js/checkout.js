@@ -1,70 +1,40 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const basketItems = document.querySelector('.basket_items');
-    const orderProcessing = document.querySelector('.order-processing');
-    const processingIcon = document.querySelector('.processing-icon');
-    const processingText = document.querySelector('.processing-text');
-    const paymentInfo = document.querySelector('.payment-info');
+// document.addEventListener('DOMContentLoaded', function () {
+//     const orderForm = document.querySelector('.order-form');
+//     console.log(orderForm);
+//     if (!orderForm) return;
 
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function() {
-            // Скрываем корзину
-            basketItems.classList.add('hidden');
-            
-            // Показываем анимацию обработки заказа
-            orderProcessing.classList.add('active');
-            processingText.classList.add('visible');
-            paymentInfo.classList.add('visible');
+//     const phoneInput = orderForm.querySelector('input[name="phone"]');
+//     const submitButton = orderForm.querySelector('button[type="submit"]');
 
-            // Отправляем запрос на сервер для оформления заказа
-            fetch('process_order.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'create_order'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Через 4 секунды показываем галочку
-                    setTimeout(() => {
-                        processingIcon.classList.add('success');
-                        processingText.textContent = 'Заказ успешно оформлен!';
-                        
-                        // Через 2 секунды показываем сообщение о пустой корзине
-                        setTimeout(() => {
-                            orderProcessing.style.display = 'none';
-                            const emptyBasketMessage = document.createElement('div');
-                            emptyBasketMessage.className = 'basket_main_txt';
-                            emptyBasketMessage.innerHTML = '<p>Ваша корзина пуста</p>';
-                            document.querySelector('.basket_main').appendChild(emptyBasketMessage);
+//     function validatePhone(phone) {
+//         const phoneRegex = /^\+7\(\d{3}\) \d{3} \d{2}-\d{2}$/;
+//         return phoneRegex.test(phone);
+//     }
 
-                            // Очищаем корзину в базе данных
-                            fetch('clear_cart.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    console.error('Ошибка при очистке корзины:', data.error);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Ошибка при очистке корзины:', error);
-                            });
-                        }, 2000);
-                    }, 4000);
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка при оформлении заказа:', error);
-            });
-        });
+//     orderForm.addEventListener('submit', function (e) {
+//         const phoneValue = phoneInput.value.trim();
+//         if (!validatePhone(phoneValue)) {
+//             e.preventDefault();
+//             alert('Неверный формат номера телефона. Используйте +7(xxx) xxx xx-xx.');
+//             phoneInput.focus();
+//         }
+//     });
+// });
+document.querySelector('#phone').onkeydown = function(e){
+    inputphone(e,document.querySelector('#phone'))
     }
-}); 
+    function inputphone(e, phone){
+    function stop(evt) {
+        evt.preventDefault();
+    }
+    let key = e.key, v = phone.value; not = key.replace(/([0-9])/, 1)
+    
+    if(not == 1 || 'Backspace' === not){
+    if('Backspace' != not){ 
+        if(v.length < 3 || v ===''){phone.value= '+7('}
+        if(v.length === 6){phone.value= v +') '}
+        if(v.length === 11){phone.value= v +' '}
+         if(v.length === 14){phone.value= v +'-'}
+        }
+    }else{stop(e)} 
+}

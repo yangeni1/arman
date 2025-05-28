@@ -113,6 +113,7 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
 <?php include 'footer.php'; ?>
     <script src="js/product-modal.js"></script>
     <script src="js/favorites.js"></script>
+    <script src="js/cart.js"></script>
 <script>
     let updateTimeout;
     const cardProductCatalog = document.getElementById('productsContainer');
@@ -295,6 +296,5 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
         updateProducts();
     });
 </script>
-<script src="js/cart.js"></script>
 </body>
 </html>

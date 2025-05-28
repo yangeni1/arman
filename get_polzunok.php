@@ -91,7 +91,9 @@ try {
         if ($product['status'] === 'хит') {
             $statusBadge = '<div class="badge_xit"><p>Хит</p></div>';
         }
-
+        if ($product['status'] === 'новинка') {
+            $statusBadge = '<div class="badge_xit"><p>Новинка</p></div>';
+        }
         // Формируем HTML-карточку товара
         $html .= '
         <div class="swiper-slide product-card-catalog-1" data-description="' . htmlspecialchars($product['description']) . '">

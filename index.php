@@ -40,7 +40,7 @@ session_start();
                         </div>
                         <div class="swiper-slide">
                             <img src="./media/banner-slider/Баннер-слайдер_4.png" alt="">
-                            <a href="" class="btn_slider fiol">Все акции и спецпредложения</a>
+                            <a href="index.php#anchor_promotions" class="btn_slider fiol">Все акции и спецпредложения</a>
                         </div>
                     </div>
                     <!-- If we need pagination -->
@@ -102,7 +102,7 @@ session_start();
                             <p>Шоколад</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Чай, кофе&subcategory_id=0">
                         <div class="card_categories_linght_green">
                             <img src="./media/recom-card-category/чай.png" alt="">
                             <p>Чай</p>
@@ -114,31 +114,31 @@ session_start();
                             <p>Восточный сладости</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Специи, приправы&subcategory_id=0">
                         <div class="card_categories_violet">
                             <img src="./media/recom-card-category/специи.png" alt="">
                             <p>Специи</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Вафли&subcategory_id=0">
                         <div class="card_categories_green">
                             <img src="./media/recom-card-category/вафли.png" alt="">
                             <p>Вафли</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Печенье&subcategory_id=0">
                         <div class="card_categories_pink">
                             <img src="./media/recom-card-category/печенье.png" alt="">
                             <p>Печенье</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Пряники&subcategory_id=0">
                         <div class="card_categories_milk">
                             <img src="./media/recom-card-category/пряники.png" alt="">
                             <p>Пряники</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Консервация&subcategory_id=0">
                         <div class="card_categories_linght_green">
                             <img src="./media/recom-card-category/консервы.png" alt="">
                             <p>Консервы</p>

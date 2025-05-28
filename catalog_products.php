@@ -3,7 +3,7 @@ include 'db.php';
 include 'header.php';
 
 $category = isset($_GET['category']) ? $_GET['category'] : '';
-$subcategory_id = isset($_GET['subcategory_id']) ? intval($_GET['subcategory_id']) : null;
+$subcategory_id = isset($_GET['subcategory_id']) ? $_GET['subcategory_id'] : null;
 
 // Получаем максимальную цену для текущей категории
 if ($category === 'Все товары') {
@@ -44,12 +44,8 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
                 <a href="catalog_products.php?category=<?= urlencode($category) ?>&subcategory_id=0"
                            class="<?= !$subcategory_id ? 'active' : '' ?>">Все</a>
                         <?php
-                        // Получаем подкатегории (имена) для текущей категории
-                        $sql = "SELECT p.category_id, c.name AS subcategory_name 
-                                FROM products p
-                                JOIN categories c ON p.category_id = c.id
-                                WHERE p.category = ?
-                                GROUP BY p.category_id, c.name";
+                        // Получаем подкатегории (category_id) для текущей категории без join с categories
+                        $sql = "SELECT DISTINCT category_id FROM products WHERE category = ?";
                         $stmt = $pdo->prepare($sql);
                         $stmt->execute([$category]);
                         $subcategories = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -57,7 +53,7 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
                         foreach ($subcategories as $sub): ?>
                             <a href="catalog_products.php?category=<?= urlencode($category) ?>&subcategory_id=<?= $sub['category_id'] ?>"
                                class="<?= ($subcategory_id == $sub['category_id']) ? 'active' : '' ?>">
-                                <?= htmlspecialchars($sub['subcategory_name']) ?>
+                                <?= htmlspecialchars($sub['category_id'] ?? '') ?>
                             </a>
                         <?php endforeach; ?>
                 </div>
@@ -143,9 +139,9 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
         if (selectedBrands.length > 0) {
             url += `&brands=${encodeURIComponent(selectedBrands.join(','))}`;
         }
-        if (<?= $subcategory_id ?>) {
-            url += `&subcategory_id=<?= $subcategory_id ?>`;
-        }else{
+        if (<?= json_encode($subcategory_id) ?> && <?= json_encode($subcategory_id) ?> !== '0') {
+            url += `&subcategory_id=<?= rawurlencode($subcategory_id) ?>`;
+        } else {
             url += `&subcategory_id=0`;
         }
         if (searchQuery) {
@@ -179,8 +175,8 @@ $categoryMaxPrice = $categoryMaxPrice ?? 1000;
         } else {
             url.searchParams.delete('brands');
         }
-        if (<?= $subcategory_id ?>) {
-            url.searchParams.set('subcategory_id', <?= $subcategory_id ?>);
+        if (<?= json_encode($subcategory_id) ?> && <?= json_encode($subcategory_id) ?> !== '0') {
+            url.searchParams.set('subcategory_id', <?= json_encode($subcategory_id) ?>);
         }
 
         window.location.href = url.toString();

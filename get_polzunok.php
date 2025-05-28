@@ -9,7 +9,7 @@ $minPrice = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
 $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 1000;
 $selectedBrands = isset($_GET['brands']) ? explode(',', $_GET['brands']) : [];
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'popularity';
-$subcategory_id = isset($_GET['subcategory_id']) ? intval($_GET['subcategory_id']) : null;
+$subcategory_id = isset($_GET['subcategory_id']) ? trim($_GET['subcategory_id']) : null;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
@@ -25,11 +25,11 @@ try {
     }
 
     // Фильтр по подкатегории (category_id)
-    if ($subcategory_id > 0) {
-        $sql .= " AND p.category_id = ?";
+    if ($subcategory_id !== null && $subcategory_id !== '0' && $subcategory_id !== 'Все') {
+        $sql .= " AND p.category_id LIKE ?";
         $params[] = $subcategory_id;
-    }else{
-        $sql .= " AND (category_id IS NULL OR category_id = 0 OR category_id IS NOT NULL)";
+    } else {
+        // No filtering by category_id if subcategory_id is '0', 'Все' or null (all subcategories)
     }
 
     // Фильтр по минимальной цене
@@ -94,12 +94,16 @@ try {
         if ($product['status'] === 'новинка') {
             $statusBadge = '<div class="badge_xit"><p>Новинка</p></div>';
         }
+        if ($product['status'] === 'распродажа') {
+            $statusBadge = '<div class="badge_rasp"><p>Распродажа</p></div>';
+        }
+      
         // Формируем HTML-карточку товара
         $html .= '
         <div class="swiper-slide product-card-catalog-1" data-description="' . htmlspecialchars($product['description']) . '">
             ' . $statusBadge . '
             <img class="img_product-card" src="' . htmlspecialchars($product['image']) . '" alt="' . htmlspecialchars($product['name']) . '">
-            <span>' . htmlspecialchars($product['category']) . '</span>
+            <span>' . htmlspecialchars($product['category_id'] ?? 'Без категории') . '</span>
             <p>' . htmlspecialchars($product['name']) . '</p>
             <div class="price">
                 <div class="price-values">';
@@ -125,7 +129,8 @@ try {
         </div>';
     }
 
-    echo json_encode(['success' => true, 'html' => $html]);
+    header('X-Debug-SQL: ' . base64_encode($sql));
+    echo json_encode(['success' => true, 'html' => $html, 'debug_params' => $params]);
 
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'error' => 'Ошибка базы данных: ' . $e->getMessage()]);

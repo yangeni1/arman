@@ -56,7 +56,7 @@ foreach ($products as $product):
         <?php endif; ?>
         
         <img class="img_product-card" src="<?= htmlspecialchars($product['image'] ?? './media/popular-product/default-product.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-        <span><?= htmlspecialchars($product['category']) ?></span>
+        <span><?= htmlspecialchars($product['category_id'] ?? 'Без категории') ?></span>
         <p><?= htmlspecialchars($product['name']) ?></p>
         <div class="price">
             <div class="price-values">

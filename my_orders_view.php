@@ -49,7 +49,7 @@ $user = $stmt->fetch();
                 // Получаем заказанные товары пользователя из новой таблицы orders
                 $stmt = $pdo->prepare('
                     SELECT o.id as order_id, o.quantity, o.datetime, o.status as order_status, o.address, o.phone,
-                           p.id, p.name, p.price, p.image, p.category, p.discount_percentage, p.status as product_status
+                           p.id, p.name, p.price, p.image, p.category, p.category_id, p.discount_percentage, p.status as product_status
                     FROM orders o
                     JOIN products p ON o.product_id = p.id
                     WHERE o.user_id = ?
@@ -77,7 +77,7 @@ $user = $stmt->fetch();
                         echo '<div class="swiper-slide product-card-catalog-2">';
                         echo $statusBadge;
                         echo '<img class="img_product-card" src="' . htmlspecialchars($product['image']) . '" alt="' . htmlspecialchars($product['name']) . '">';
-                        echo '<span>' . htmlspecialchars($product['category']) . '</span>';
+echo '<span>' . htmlspecialchars($product['category_id'] ?? 'Без категории') . '</span>';
                         echo '<p>' . htmlspecialchars($product['name']) . '</p>';
 
                         echo '<div class="price">';

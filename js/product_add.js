@@ -1,13 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Загрузка выпадающих списков
-    loadOptions('/api/get_statuses.php', 'status_id');
     loadOptions('/api/get_categories.php', 'categories');
     loadOptions('/api/get_brands.php', 'brand_id');
     
-    // Инициализация загрузки изображений
     initImageUploads();
     
-    // Инициализация валидации формы
     initFormValidation();
 });
 
@@ -67,28 +64,8 @@ function initImageUploads() {
         }
     });
 
-    document.getElementById('addMoreImages')?.addEventListener('click', addImageUploadField);
 }
 
-function addImageUploadField() {
-    const container = document.getElementById('imageUploads');
-    const items = container.querySelectorAll('.image-upload-item');
-    const newIndex = items.length;
-
-    const newItem = document.createElement('div');
-    newItem.className = 'image-upload-item';
-    newItem.innerHTML = `
-        <input type="file" name="images[]" accept="image/*" class="image-input">
-        <img src="#" alt="Предпросмотр" class="image-preview" style="display: none;">
-        <button type="button" class="remove-image-btn" style="display: none;">×</button>
-        <div class="image-meta">
-            <label>
-                <input type="radio" name="main_image" value="${newIndex}"> Сделать главным
-            </label>
-        </div>
-    `;
-    container.appendChild(newItem);
-}
 
 function handleImageUpload(input) {
     const file = input.files[0];
@@ -116,10 +93,6 @@ function handleImageUpload(input) {
     };
     reader.readAsDataURL(file);
 
-    const allInputs = document.querySelectorAll('.image-input');
-    if (input === allInputs[allInputs.length - 1]) {
-        addImageUploadField();
-    }
 }
 
 function updateImageIndexes() {
@@ -150,7 +123,7 @@ function initFormValidation() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const requiredFields = ['status', 'category', 'brand', 'name', 'price', 'quantity'];
+        const requiredFields = ['status', 'category', 'brand', 'name', 'price'];
         let isValid = true;
 
         requiredFields.forEach(fieldId => {
@@ -184,7 +157,6 @@ async function submitProductForm(form) {
     responseElement.innerHTML = '<div class="alert alert-info">Отправка данных...</div>';
 
     try {
-        // Убедимся, что выбрано главное изображение
         const mainImageSelected = document.querySelector('input[name="main_image"]:checked') !== null;
         if (!mainImageSelected) {
             const firstItem = document.querySelector('.image-upload-item');
@@ -205,10 +177,13 @@ async function submitProductForm(form) {
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.data}`);
 
-        const data = await response.json();
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        const data = JSON.parse(responseText);
         if (data.success) {
-            showMessage('success', `Товар успешно добавлен<br>ID товара: ${data.product_id}`, 8000);
-            resetForm();
+            console.log('Parsed response data:', data); 
+            const responseElement = document.getElementById('responseMessage');
+            responseElement.innerHTML = `<div class="alert alert-success">Товар успешно добавлен. <a href="/edit_product.php?id=${data.id}">Редактировать товар</a></div>`;
         } else {
             throw new Error(data.message || 'Unknown error');
         }
@@ -225,7 +200,7 @@ function resetForm() {
     const container = document.getElementById('imageUploads');
     container.innerHTML = `
         <div class="image-upload-item">
-            <input type="file" name="images[]" accept="image/*" class="image-input" required>
+            <input type="file" name="image" accept="image/*" class="image-input" required>
             <img src="#" alt="Предпросмотр" class="image-preview" style="display: none;">
             <button type="button" class="remove-image-btn" style="display: none;">×</button>
             <div class="image-meta">

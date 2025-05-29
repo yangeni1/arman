@@ -23,27 +23,24 @@ session_start();
                     <img src="./media/banner-slider/стрелка слайдера левая.svg" alt="Previous">
                 </div>
                 <div class="swiper">
-                    <!-- Additional required wrapper -->
                     <div class="swiper-wrapper">
-                        <!-- Slides -->
                         <div class="swiper-slide">
-                            <img src="./media/banner-slider/Баннер-слайдер_1.png" alt="">
+                            <img style="height: 100%;" src="./media/banner-slider/Баннер-слайдер_1.png" alt="">
                             <a href="./catalog.php" class="btn_slider">Перейти в каталог</a>
                         </div>
                         <div class="swiper-slide">
-                            <img src="./media/banner-slider/Баннер-слайдер_2.png" alt="">
+                            <img style="height: 100%;" src="./media/banner-slider/Баннер-слайдер_2.png" alt="">
                             <a href="./catalog.php" class="btn_slider sin">Перейти в каталог</a>
                         </div>
                         <div class="swiper-slide">
-                            <img src="./media/banner-slider/Баннер-слайдер_3.png" alt="">
+                            <img style="height: 100%;" src="./media/banner-slider/Баннер-слайдер_3.png" alt="">
                             <a href="./catalog.php" class="btn_slider roz">Перейти в каталог</a>
                         </div>
                         <div class="swiper-slide">
-                            <img src="./media/banner-slider/Баннер-слайдер_4.png" alt="">
+                            <img style="height: 100%;" src="./media/banner-slider/Баннер-слайдер_4.png" alt="">
                             <a href="index.php#anchor_promotions" class="btn_slider fiol">Все акции и спецпредложения</a>
                         </div>
                     </div>
-                    <!-- If we need pagination -->
                     <div class="swiper-pagination custom-pagination"></div>
                 </div>
                 <div class="swiper-button-next custom-next">

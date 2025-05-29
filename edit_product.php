@@ -1,159 +1,215 @@
+
 <?php
-require_once 'db.php';
-if (!isset($_GET['id'])) {
-    header("Location: product_list.php");
-    exit();
+require './db.php';
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    header('Location: index.php');
+    exit;
+}
+if ($user['role'] === 'user' ) {
+    header('Location: index.php');
+    exit;
 }
 
-$productId = $_GET['id'];
 
-// Получаем данные товара
-$stmt = $pdo->prepare("
-    SELECT p.*, c.name as category_name, b.name as brand_name, s.status as status_name
-    FROM product p
-    LEFT JOIN category c ON p.category_id = c.id
-    LEFT JOIN brand b ON p.brand_id = b.id
-    LEFT JOIN status s ON p.status_id = s.id
-    WHERE p.id = ?
-");
-$stmt->execute([$productId]);
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("Неверный ID товара");
+}
+$product_id = $_GET['id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $price = $_POST['price'];
+    $discount_percentage = $_POST['discount_percentage'] ?? 0;
+    $status = $_POST['status'] ?? 1;
+    $category = $_POST['category'] ?? null;
+    $category_id = $_POST['category_id'] ?? null;
+    $brand = $_POST['brand'] ?? null;
+
+
+    $image = $_POST['current_image'];
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+        $upload_dir = 'uploads/products/';
+        $file_ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($file_ext, $allowed_ext)) {
+            $new_filename = uniqid('img_', true) . '.' . $file_ext;
+            $upload_path = $upload_dir . $new_filename;
+
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
+
+                if ($image && file_exists($image)) {
+                    unlink($image);
+                }
+                $image = $upload_path;
+            } else {
+                echo "<p class='error'>Ошибка при загрузке файла</p>";
+            }
+        } else {
+            echo "<p class='error'>Недопустимый формат файла</p>";
+        }
+    }
+
+
+    $stmt = $pdo->prepare("
+        UPDATE products SET 
+            name = ?, description = ?, price = ?,  
+            discount_percentage = ?, status = ?, category = ?, category_id = ?, 
+            brand = ?, image = ? 
+        WHERE id = ?
+    ");
+    $stmt->execute([
+        $name, $description, $price, $discount_percentage,
+        $status, $category, $category_id, $brand, $image, $product_id
+    ]);
+
+    echo "<p class='success'>Товар успешно обновлен!</p>";
+
+}
+
+
+$stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+$stmt->execute([$product_id]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
-    header("Location: product_list.php");
-    exit();
+    die("Товар не найден");
 }
 
-// Получаем изображения товара
-$stmt = $pdo->prepare("
-    SELECT i.id, i.image_url, i.main_image
-    FROM product_images pi
-    JOIN image i ON pi.image_id = i.id
-    WHERE pi.product_id = ?
-    ORDER BY i.main_image DESC
-");
-$stmt->execute([$productId]);
-$images = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->query("SELECT name FROM brand");
+$brands = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Получаем категории, бренды и статусы
-$categories = $pdo->query("SELECT id, name FROM category")->fetchAll();
-$brands = $pdo->query("SELECT id, name FROM brand")->fetchAll();
-$statuses = $pdo->query("SELECT id, status FROM status")->fetchAll();
+$stmt = $pdo->query("SELECT name FROM categories");
+$subcategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+$main_categories = ['Конфеты', 'Вафли', 'Печенье', 'Шоколад, шоколадные пасты', 'Пастила, мармелад', 'Пряники', 'Баранки, сушки', 'Пирожные, кексы', 'Выпечка', 'Соки, напитки', 'Чай, кофе', 'Специи, приправы', 'Детские товары', 'Праздничный ассортимент', 'Консервация', 'Макаронные изделия, крупы'];
+
+$statuses = ['', 'хит', 'новинка', 'распродажа'];
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Редактирование товара</title>
-    <link rel="stylesheet" href="css/edit_product.css">
+    <title>Редактировать товар</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="./css/admin_panel.css">
+    <link rel="stylesheet" href="./css/adminpanel_header.css">
+    <style>
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .img_redact{
+        width: 200px;
+    }
+</style>
 </head>
 <body>
-    <div class="container_main_admin">
-        <h1>Редактирование товара: <?= htmlspecialchars($product['name']) ?></h1>
+<?php
+include './header_adminpanel.php'
+?>
+<div class="container buttom ">
+        <div class="container_main">
+            <div class="container_main_admin">
+                <h2>Редактировать товар</h2>
 
-        <form id="product-form" data-id="<?= $product['id'] ?>">
-            <!-- Название -->
-            <div class="form-group">
-                <label>Название:</label>
-                <input type="text" name="name" value="<?= htmlspecialchars($product['name']) ?>">
-                <button type="button" class="apply-field" data-field="name">Применить</button>
-            </div>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="current_image" value="<?= htmlspecialchars($product['image']) ?>">
 
-            <!-- Цена -->
-            <div class="form-group">
-                <label>Цена:</label>
-                <input type="number" step="0.01" name="price" value="<?= $product['price'] ?>">
-                <button type="button" class="apply-field" data-field="price">Применить</button>
-            </div>
+                    <label>Название:
+                        <input type="text" name="name" value="<?= htmlspecialchars($product['name']) ?>" required>
+                    </label>
 
-            <!-- Скидка -->
-            <div class="form-group">
-                <label>Скидка (%):</label>
-                <input type="number" step="1" min="0" max="100" name="sale" value="<?= $product['sale'] ?? 0 ?>">
-                <button type="button" class="apply-field" data-field="sale">Применить</button>
-            </div>
+                    <label>Описание:
+                        <textarea name="description"><?= htmlspecialchars($product['description']) ?></textarea>
+                    </label>
 
-            <!-- Цены со скидкой -->
-            <div class="form-group">
-                <label>Цена со скидкой:</label>
-                <output id="discounted-price">
-                    <?= number_format($product['price'] * (1 - ($product['sale'] / 100)), 2) ?> ₽
-                </output>
-            </div>
+                    <label>Цена:
+                        <input type="number" step="0.01" name="price" value="<?= $product['price'] ?>" required>
+                    </label>
+                    <label>Скидка (%):
+                        <input type="number" step="1" name="discount_percentage" value="<?= $product['discount_percentage'] ?>">
+                    </label>
 
-            <!-- Категория -->
-            <div class="form-group">
-                <label>Категория:</label>
-                <select name="category_id">
-                    <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['id'] ?>" <?= $category['id'] == $product['category_id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($category['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <button type="button" class="apply-field" data-field="category_id">Применить</button>
-            </div>
-
-            <!-- Бренд -->
-            <div class="form-group">
-                <label>Бренд:</label>
-                <select name="brand_id">
-                    <?php foreach ($brands as $brand): ?>
-                        <option value="<?= $brand['id'] ?>" <?= $brand['id'] == $product['brand_id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($brand['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <button type="button" class="apply-field" data-field="brand_id">Применить</button>
-            </div>
-
-            <!-- Статус -->
-            <div class="form-group">
-                <label>Статус:</label>
-                <select name="status_id">
-                    <?php foreach ($statuses as $status): ?>
-                        <option value="<?= $status['id'] ?>" <?= $status['id'] == $product['status_id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($status['status']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <button type="button" class="apply-field" data-field="status_id">Применить</button>
-            </div>
-
-            <!-- Описание -->
-            <div class="form-group">
-                <label>Описание:</label>
-                <textarea name="description"><?= htmlspecialchars($product['description']) ?></textarea>
-                <button type="button" class="apply-field" data-field="description">Применить</button>
-            </div>
-
-            <!-- Кнопка сохранения всех изменений -->
-            <button type="button" class="save-all">Сохранить все изменения</button>
-        </form>
-
-        <h2>Изображения товара</h2>
-        <div class="product-images">
-            <?php foreach ($images as $image): ?>
-                <div class="image-container<?= $image['main_image'] ? ' main-image' : '' ?>" data-image-id="<?= $image['id'] ?>">
-                    <img src="/uploads/products/<?= basename($image['image_url']) ?>" alt="Товарное изображение" class="image-preview">
-                    <div class="image-actions">
-                        <input type="file" class="image-file" accept="image/*">
-                        <button class="update-image">Обновить</button>
-                        <button class="set-main-image"<?= $image['main_image'] ? ' disabled' : '' ?>>Сделать главной</button>
-                        <button class="delete-image">Удалить</button>
-                    </div>
+                    <label>Статус:
+                        <select name="status">
+                            <?php foreach ($statuses as $status_option): ?>
+                                <option value="<?= htmlspecialchars($status_option) ?>" <?= $status_option === $product['status'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($status_option) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                <div class="form-group">
+                    <label>Категория:
+                        <select name="category" required>
+                            <?php foreach ($main_categories as $main_category): ?>
+                                <option value="<?= htmlspecialchars($main_category) ?>" <?= $main_category === $product['category'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($main_category) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                 </div>
-            <?php endforeach; ?>
-        </div>
+                    
+                    <label>Подкатегория:
+                        <select name="category_id" required>
+                            <?php foreach ($subcategories as $subcategory): ?>
+                                <option value="<?= htmlspecialchars($subcategory) ?>" <?= $subcategory === $product['category_id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($subcategory) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
 
-        <!-- Форма добавления новых изображений -->
-        <div class="add-image">
-            <h3>Добавить изображения</h3>
-            <input type="file" id="new-image-file" name="images[]" multiple accept="image/*">
-            <button id="add-image">Загрузить и добавить</button>
-            <div id="image-preview-container" style="margin-top:10px;"></div>
+                    <label>Бренд:
+                        <select name="brand" required>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?= htmlspecialchars($brand) ?>" <?= $brand === $product['brand'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($brand) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+
+                    <label>Изображение:
+                        <input type="file" name="image">
+                        <?php if ($product['image']): ?>
+                            <img class="image-preview" src="/<?= htmlspecialchars($product['image']) ?>" alt="Текущее изображение">
+                        <?php endif; ?>
+                    </label>
+
+                    <button type="submit">Сохранить изменения</button>
+                </form>
+            </div>
         </div>
     </div>
-    <script src="js/product_management.js"></script>
 </body>
 </html>

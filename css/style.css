@@ -542,8 +542,10 @@ input:focus{
   height: 476px;
 }
 .swiper-slide>img{
-    border-radius: 30px ;
+    border-radius: 16px ;
     width: 100%;
+    height: 195px;
+    object-fit: cover;
 }
 .swiper-button-prev::after,
 .swiper-button-next::after{
@@ -830,8 +832,8 @@ input:focus{
     cursor: pointer;
 }
 .img_product-card>img{
-    width: 261;
-    height: 264;
+    width: 261px;
+    height: 264px;
 }
 .badge_xit{
     position: absolute;

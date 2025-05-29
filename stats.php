@@ -1,6 +1,24 @@
 <?php
 require 'db.php';
-// Запрос основной статистики товаров
+
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    header('Location: index.php');
+    exit;
+}
+if ($user['role'] === 'user' ) {
+    header('Location: index.php');
+    exit;
+}
+
 $stmt = $pdo->query("
     SELECT 
         COUNT(*) AS total_products,
@@ -12,10 +30,9 @@ $stmt = $pdo->query("
     FROM products
 ");
 $stats = $stmt->fetch(PDO::FETCH_ASSOC);
-// Запрос статистики заказов
+
 $order_stats = [];
 
-// Общее количество заказов
 $stmt = $pdo->query("SELECT COUNT(*) AS total_orders FROM orders");
 $order_stats['total_orders'] = $stmt->fetchColumn();
 
@@ -68,11 +85,6 @@ $stmt = $pdo->query("
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $monthly_order_stats[$row['order_date']] = $row['order_count'];
 }
-
-
-
-
-
 
 
 // Топ-5 самых популярных товаров
@@ -217,10 +229,6 @@ require 'header_adminpanel.php';
         <div class="stat-value"><?= number_format($stats['average_price'], 2, ',', ' ') ?> ₽</div>
     </div>
     <div class="stat-card">
-        <div class="stat-title">Средний рейтинг</div>
-        <div class="stat-value"><?= number_format($stats['average_rating'], 1, ',', '') ?>/5</div>
-    </div>
-    <div class="stat-card">
         <div class="stat-title">Товаров со скидкой</div>
         <div class="stat-value"><?= number_format($stats['discounted_products'], 0, '', ' ') ?></div>
     </div>
@@ -254,7 +262,6 @@ require 'header_adminpanel.php';
         <canvas id="monthlyOrderChart" class="chart-container"></canvas>
 
        <script>
-        // Данные для диаграммы
         const monthlyOrderData = {
             labels: <?php echo json_encode(array_keys($monthly_order_stats)); ?>,
             datasets: [{
@@ -284,7 +291,6 @@ require 'header_adminpanel.php';
             },
         };
 
-        // Инициализация диаграммы
         const monthlyCtx = document.getElementById('monthlyOrderChart').getContext('2d');
         new Chart(monthlyCtx, monthlyConfig);
     </script>

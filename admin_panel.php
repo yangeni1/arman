@@ -1,3 +1,23 @@
+<?php
+require './db.php';
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    header('Location: index.php');
+    exit;
+}
+if ($user['role'] === 'user' ) {
+    header('Location: index.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -12,17 +32,17 @@
 
 <body>
     <?php
-    include 'header_adminpanel.php'
+    include './header_adminpanel.php'
     ?>
     <!-- Добавление категорий -->
     <div class="container buttom ">
         <div class="container_main">
             <div class="container_main_admin">
-                <h1>Добавить новую категорию</h1>
+                <h1>Добавить новую подкатегорию категорию</h1>
                 <form id="categoryForm">
                     <div class="form-group">
-                        <label for="category_name">Название категории:</label>
-                        <input type="text" id="category_name" name="category_name" required maxlength="300">
+                        <label for="category_name">Название подкатегории:</label>
+                        <input type="text" id="category_name" name="category_name" required maxlength="255">
                     </div>
                     <button type="submit">Добавить подкатегорию</button>
                 </form>
@@ -31,20 +51,6 @@
         </div>
     </div>
     <!-- Добавление категорий конец -->
-
-    <!-- Добавление Статуса -->
-    <div class="container_main_admin">
-        <h1>Добавить новый статус товара</h1>
-        <form id="statusForm">
-            <div class="form-group">
-                <label for="status_name">Название статуса:</label>
-                <input type="text" id="status_name" name="status_name" required maxlength="300">
-            </div>
-            <button type="submit">Добавить категорию</button>
-        </form>
-        <div id="statusResponseMessage"></div>
-    </div>
-    <!-- Добавление Статуса конец -->
 
     <!-- Добавление Бренда -->
     <div class="container_main_admin">
@@ -66,8 +72,11 @@
         <form id="productForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="status_id">Статус:</label>
-                <select id="status_id" name="status_id" required>
+                <select id="status_id" name="status_id" >
                     <option value="">Выберите статус</option>
+                    <option value="хит">Хит</option>
+                    <option value="новинка">Новинка</option>
+                    <option value="распродажа">Распродажа</option>
                 </select>
             </div>
 
@@ -75,6 +84,7 @@
                 <label for="category_id">Категория:</label>
                 <select id="category_id" name="category_id" required>
                     <option value="">Выберите категорию</option>
+                    <option value="Конфеты">Конфеты</option>
                     <option value="Вафли">Вафли</option>
                     <option value="Печенье">Печенье</option>
                     <option value="Шоколад, шоколадные пасты">Шоколад, шоколадные пасты</option>
@@ -124,12 +134,6 @@
                 <label for="price">Цена:</label>
                 <input type="number" id="price" name="price" step="0.01" min="0.01" required>
             </div>
-
-            <div class="form-group">
-                <label for="quantity">Количество:</label>
-                <input type="number" id="quantity" name="quantity" min="0" required>
-            </div>
-
             <div class="form-group">
                 <label for="description">Описание:</label>
                 <textarea id="description" name="description" rows="4"></textarea>
@@ -144,13 +148,12 @@
                         <button type="button" class="remove-image-btn" style="display: none;">×</button>
                         <div class="image-meta">
                             <label>
-                                <input type="radio" name="main_image" value="0" checked> Главное изображение
+                                <!-- Removed main image radio since only one image is allowed and it is main by default -->
+                                <input type="radio" name="main_image" value="0" checked hidden>
                             </label>
                         </div>
                     </div>
                 </div>
-                <button type="button" id="addMoreImages">Добавить еще изображение</button>
-                <small>Первое изображение будет главным по умолчанию</small>
             </div>
 
             <button type="submit">Добавить товар</button>

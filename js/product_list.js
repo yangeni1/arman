@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="product-price">${parseFloat(product.price).toFixed(2)} ₽</div>
                     </div>
                     <div class="actions">
-                        <a href="/api/edit_product.php?id=${product.id}" class="btn btn-edit">Редактировать</a>
+                        <a href="/edit_product.php?id=${product.id}" class="btn btn-edit">Редактировать</a>
                         <button class="btn btn-delete delete-product" data-id="${product.id}">Удалить</button>
                     </div>
                 </div>

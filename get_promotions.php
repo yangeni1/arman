@@ -1,19 +1,28 @@
 <?php
 require_once 'db.php';
 
-// Получаем категорию из GET-параметра
 $category = $_GET['category'] ?? 'Все';
 
-// Формируем SQL-запрос для товаров со скидками
+$params = [];
+$sqlCategories = "SELECT p.category, COUNT(*) AS discount_count
+                  FROM products p
+                  WHERE p.discount_percentage IS NOT NULL OR p.status = 'распродажа'
+                  GROUP BY p.category
+                  ORDER BY discount_count DESC
+                  LIMIT 5";
+$categoriesQuery = $pdo->query($sqlCategories);
+$dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
+
+$categories = array_merge(['Все'], $dbCategories);
+
 $sql = "SELECT * FROM products 
         WHERE (discount_percentage IS NOT NULL OR status = 'распродажа')";
 
-// Добавляем фильтр по категории если нужно
 if ($category !== 'Все') {
     $sql .= " AND category = :category";
+    $params[':category'] = $category;
 }
 
-// Сортировка для акционных товаров
 $sql .= " ORDER BY 
           CASE 
               WHEN status = 'распродажа' THEN 1
@@ -21,15 +30,10 @@ $sql .= " ORDER BY
           END, 
           discount_percentage DESC,
           rating DESC
-          LIMIT 12";
+          LIMIT 5";
 
-// Подготавливаем и выполняем запрос
 $query = $pdo->prepare($sql);
-if ($category !== 'Все') {
-    $query->execute([':category' => $category]);
-} else {
-    $query->execute();
-}
+$query->execute($params);
 $products = $query->fetchAll(PDO::FETCH_ASSOC);
 
 // Выводим HTML для каждого товара

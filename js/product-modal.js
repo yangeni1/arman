@@ -210,4 +210,4 @@ document.addEventListener('DOMContentLoaded', function() {
     containers.forEach(container => {
         observer.observe(container, { childList: true, subtree: true });
     });
-}); 
+});

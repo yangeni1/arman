@@ -78,6 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function addFavoriteButtonsListeners() {
         const favoriteButtons = document.querySelectorAll('.add-to-favorites-btn');
         favoriteButtons.forEach(button => {
+            // Avoid adding multiple event listeners to the same button
+            if (button.dataset.favListenerAdded) {
+                return;
+            }
+            button.dataset.favListenerAdded = 'true';
+
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -110,4 +116,4 @@ document.addEventListener('DOMContentLoaded', function() {
     containers.forEach(container => {
         observer.observe(container, { childList: true, subtree: true });
     });
-}); 
+});

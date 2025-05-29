@@ -4,28 +4,23 @@ require_once 'db.php';
 // Получаем категорию из GET-параметра
 $selectedCategory = $_GET['category'] ?? 'Все';
 
-// Формируем SQL-запрос в зависимости от выбранной категории
-$sql = "SELECT * FROM products WHERE rating > 4.5";
+$params = [];
+$sql = "SELECT p.*, COALESCE(SUM(o.quantity), 0) AS total_ordered
+        FROM products p
+        LEFT JOIN orders o ON p.id = o.product_id
+        WHERE 1=1";
+
 if ($selectedCategory !== 'Все') {
-    $sql .= " AND category = :category";
+    $sql .= " AND p.category = :category";
+    $params[':category'] = $selectedCategory;
 }
-$sql .= " ORDER BY 
-          CASE 
-              WHEN status = 'хит' THEN 1
-              WHEN status = 'новинка' THEN 2
-              WHEN status = 'распродажа' THEN 3
-              WHEN discount_percentage IS NOT NULL THEN 4
-              ELSE 5
-          END, rating DESC
+
+$sql .= " GROUP BY p.id
+          ORDER BY total_ordered DESC
           LIMIT 14";
 
-// Подготавливаем и выполняем запрос
 $query = $pdo->prepare($sql);
-if ($selectedCategory !== 'Все') {
-    $query->execute([':category' => $selectedCategory]);
-} else {
-    $query->execute();
-}
+$query->execute($params);
 $products = $query->fetchAll(PDO::FETCH_ASSOC);
 
 // Возвращаем HTML-разметку для товаров

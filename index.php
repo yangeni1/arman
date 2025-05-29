@@ -87,13 +87,13 @@ session_start();
                             <p>Конфеты</p>
                         </div>
                     </a>
-                    <a href="catalog_products.php?subcategory_id=3">
+                    <a href="catalog_products.php?category=Конфеты&subcategory_id=Карамель">
                         <div class="card_categories_milk">
                             <img src="./media/recom-card-category/карамель.png" alt="">
                             <p>Карамель</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Шоколад, шоколадные пасты&subcategory_id=0">
                         <div class="card_categories_pink">
                             <img src="./media/recom-card-category/шоколад.png" alt="">
                             <p>Шоколад</p>
@@ -105,7 +105,7 @@ session_start();
                             <p>Чай</p>
                         </div>
                     </a>
-                    <a href="">
+                    <a href="catalog_products.php?category=Пастила, мармелад&subcategory_id=0">
                         <div class="card_categories_pink">
                             <img src="./media/recom-card-category/восточные сладости.png" alt="">
                             <p>Восточный сладости</p>
@@ -154,7 +154,7 @@ session_start();
                         <span>нашей целью является удовлетворение потребностей покупателей в качественной продукции</span>
                     </div>
                     <div class="btn_banner_green">
-                        <a href="">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
+                        <a href="about.php">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
                     </div>
                 </div>
                 <div class="banner_blue">
@@ -163,7 +163,7 @@ session_start();
                         <span>по Тюмени и Кургану при заказе от <br> 1000 рублей</span>
                     </div>
                     <div class="btn_banner_blue">
-                        <a href="">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
+                        <a href="delivery.php">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
                     </div>
                 </div>
                 <div class="banner_orange">
@@ -172,7 +172,7 @@ session_start();
                         <span>в двух розничных магазинах в <br> Кургане и складе в Тюмени</span>
                     </div>
                     <div class="btn_banner_orange">
-                        <a href="">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
+                        <a href="contant.php">Подробнее <img src="./media/banner/иконка стрелочка.svg" alt=""></a>
                     </div>
                 </div>
             </div>
@@ -181,46 +181,40 @@ session_start();
     <?php
     require_once 'db.php';
 
-    // Получаем все уникальные категории из базы данных, сортируя по среднему рейтингу
-    $categoriesQuery = $pdo->query("
-    SELECT category, AVG(rating) as avg_rating 
-    FROM products 
-    WHERE rating > 4.5
-    GROUP BY category 
-    ORDER BY avg_rating DESC
-    LIMIT 8
-");
-    $dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
+$params = [];
+$sqlCategories = "SELECT p.category, COALESCE(SUM(o.quantity), 0) AS total_sold
+                  FROM products p
+                  LEFT JOIN orders o ON p.id = o.product_id
+                  GROUP BY p.category
+                  ORDER BY total_sold DESC
+                  LIMIT 5";
+$categoriesQuery = $pdo->query($sqlCategories);
+$dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
 
-    // Добавляем "Все" в начало списка категорий
-    $categories = array_merge(['Все'], $dbCategories);
+// Добавляем "Все" в начало списка категорий
+$categories = array_merge(['Все'], $dbCategories);
 
     // Определяем выбранную категорию (из GET-параметра)
     $selectedCategory = $_GET['category'] ?? 'Все';
 
-    // Формируем SQL-запрос в зависимости от выбранной категории
-    $sql = "SELECT * FROM products WHERE rating > 4.5";
-    if ($selectedCategory !== 'Все') {
-        $sql .= " AND category = :category";
-    }
-    $sql .= " ORDER BY 
-          CASE 
-              WHEN status = 'хит' THEN 1
-              WHEN status = 'новинка' THEN 2
-              WHEN status = 'распродажа' THEN 3
-              WHEN discount_percentage IS NOT NULL THEN 4
-              ELSE 5
-          END, rating DESC
+$params = [];
+$sql = "SELECT p.*, COALESCE(SUM(o.quantity), 0) AS total_ordered
+        FROM products p
+        LEFT JOIN orders o ON p.id = o.product_id
+        WHERE 1=1";
+
+if ($selectedCategory !== 'Все') {
+    $sql .= " AND p.category = :category";
+    $params[':category'] = $selectedCategory;
+}
+
+$sql .= " GROUP BY p.id
+          ORDER BY total_ordered DESC
           LIMIT 8";
 
-    // Подготавливаем и выполняем запрос
-    $query = $pdo->prepare($sql);
-    if ($selectedCategory !== 'Все') {
-        $query->execute([':category' => $selectedCategory]);
-    } else {
-        $query->execute();
-    }
-    $products = $query->fetchAll(PDO::FETCH_ASSOC);
+$query = $pdo->prepare($sql);
+$query->execute($params);
+$products = $query->fetchAll(PDO::FETCH_ASSOC);
     ?>
 
     <div class="container">
@@ -310,41 +304,39 @@ session_start();
         <?php
         require_once 'db.php';
 
-        // Получаем категории товаров со скидками
-        $categoriesQuery = $pdo->query("SELECT DISTINCT category FROM products WHERE discount_percentage IS NOT NULL OR status = 'распродажа'");
-        $dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
-        $categories = array_merge(['Все'], $dbCategories);
+$params = [];
+$sqlCategories = "SELECT p.category, COUNT(*) AS discount_count
+                  FROM products p
+                  WHERE p.discount_percentage IS NOT NULL OR p.status = 'распродажа'
+                  GROUP BY p.category
+                  ORDER BY discount_count DESC
+                  LIMIT 5";
+$categoriesQuery = $pdo->query($sqlCategories);
+$dbCategories = $categoriesQuery->fetchAll(PDO::FETCH_COLUMN);
+$categories = array_merge(['Все'], $dbCategories);
 
-        // Определяем выбранную категорию
-        $selectedCategory = $_GET['category'] ?? 'Все';
+$selectedCategory = $_GET['category'] ?? 'Все';
 
-        // Формируем SQL-запрос для товаров со скидками
-        $sql = "SELECT * FROM products 
+$sql = "SELECT * FROM products 
         WHERE (discount_percentage IS NOT NULL OR status = 'распродажа')";
 
-        // Добавляем фильтр по категории если нужно
-        if ($selectedCategory !== 'Все') {
-            $sql .= " AND category = :category";
-        }
+if ($selectedCategory !== 'Все') {
+    $sql .= " AND category = :category";
+    $params[':category'] = $selectedCategory;
+}
 
-        // Сортировка для акционных товаров
-        $sql .= " ORDER BY 
+$sql .= " ORDER BY 
           CASE 
               WHEN status = 'распродажа' THEN 1
               ELSE 2
           END, 
           discount_percentage DESC,
           rating DESC
-          LIMIT 12";
+          LIMIT 5";
 
-        // Подготавливаем и выполняем запрос
-        $query = $pdo->prepare($sql);
-        if ($selectedCategory !== 'Все') {
-            $query->execute([':category' => $selectedCategory]);
-        } else {
-            $query->execute();
-        }
-        $products = $query->fetchAll(PDO::FETCH_ASSOC);
+$query = $pdo->prepare($sql);
+$query->execute($params);
+$products = $query->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
         <div class="container">
@@ -428,83 +420,48 @@ session_start();
         </div>
         <div class="container">
             <div class="container_main">
-                <div class="container_news">
-                    <div class="news">
-                        <div class="txt_preview">
-                            <p id="anchor_news">Новинки</p>
-                        </div>
-                        <div class="container_news_card">
-                            <div class="card_news">
-                                <div class="card_img gre">
-                                    <img src="./media/news/фотография товара (1).png" alt="">
-                                </div>
-                                <div class="txt_news">
-                                    <p>Чай Пиала Голд черный гранулированный Кофе-шоколад, 200г</p>
-
-                                    <div class="price-values card_news_price">
-                                        <p>₽214.4</p>
-                                    </div>
-                                    <div class="btn_news_card">
-                                        <button class="add-to-cart-btn">
-                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                        </button>
-                                    </div>
-                                </div>
+            <div class="container_news">
+                <div class="news">
+                    <div class="txt_preview">
+                        <p id="anchor_news">Новинки</p>
+                    </div>
+                    <div class="container_news_card">
+                        <?php
+                        require_once 'db.php';
+                        $newProductsQuery = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 4");
+                        $newProducts = $newProductsQuery->fetchAll(PDO::FETCH_ASSOC);
+                        $classes = ['gre', 'pur', 'pin', 'yel'];
+                        foreach ($newProducts as $product):
+                            $discountPrice = $product['discount_percentage']
+                                ? $product['price'] * (1 - $product['discount_percentage'] / 100)
+                                : null;
+                            $randomClass = $classes[array_rand($classes)];
+                        ?>
+                        <div class="card_news">
+                            <div class="card_img <?= $randomClass ?>">
+                                <img src="<?= htmlspecialchars($product['image'] ?? './media/news/default.png') ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                             </div>
-                            <div class="card_news">
-                                <div class="card_img pur">
-                                    <img src="./media/news/фотография товара.png" alt="">
+                            <div class="txt_news">
+                                <p><?= htmlspecialchars($product['name']) ?></p>
+                                <div class="price-values card_news_price">
+                                    <?php if ($discountPrice): ?>
+                                        <p>₽<?= number_format($discountPrice, 2) ?></p>
+                                        <span>₽<?= number_format($product['price'], 2) ?></span>
+                                    <?php else: ?>
+                                        <p>₽<?= number_format($product['price'], 2) ?></p>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="txt_news">
-                                    <p>Конфитрейд Сладкий календарь Леди Баг, 55 г</p>
-
-                                    <div class="price-values card_news_price">
-                                        <p>₽99</p>
-                                    </div>
-                                    <div class="btn_news_card">
-                                        <button class="add-to-cart-btn">
-                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card_news">
-                                <div class="card_img pin">
-                                    <img src="./media/news/фотография товара (2).png" alt="">
-                                </div>
-                                <div class="txt_news">
-                                    <p>BS Конфеты Тай-Тай Шоко, крем-брюле, 1 кг </p>
-
-                                    <div class="price-values card_news_price">
-                                        <p>₽453</p>
-                                    </div>
-                                    <div class="btn_news_card">
-                                        <button class="add-to-cart-btn">
-                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card_news">
-                                <div class="card_img yel">
-                                    <img src="./media/news/фотография товара (3).png" alt="">
-                                </div>
-                                <div class="txt_news">
-                                    <p>Новогодний подарок Полосатая семейка, 400 гр</p>
-
-                                    <div class="price-values card_news_price">
-                                        <p>₽119</p>
-                                    </div>
-                                    <div class="btn_news_card">
-                                        <button class="add-to-cart-btn">
-                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                        </button>
-                                    </div>
+                                <div class="btn_news_card">
+                                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                        <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
         <div class="container">
@@ -524,7 +481,7 @@ session_start();
                                 <p>— Драже и многое другое.</p>
                             </div>
                             <p class="txt_about_2">У нас свежая продукция с широким ассортиментом и постоянным обновлением. Осуществляем доставку товаров по России.</p>
-                            <a href="/about.php" class="btn_about">Подробности</a>
+                            <a href="about.php" class="btn_about">Подробности</a>
                         </div>
                         <div class="img_about">
                             <img src="./media/about/people.png" alt="">

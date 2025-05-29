@@ -38,7 +38,7 @@ if ($user['role'] === 'user' ) {
     <div class="container buttom ">
         <div class="container_main">
             <div class="container_main_admin">
-                <h1>Добавить новую подкатегорию категорию</h1>
+                <h1>Добавить новую подкатегорию</h1>
                 <form id="categoryForm">
                     <div class="form-group">
                         <label for="category_name">Название подкатегории:</label>

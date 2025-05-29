@@ -1199,6 +1199,13 @@ input:focus{
     width: 340.5px;
     height: 310.17px;
 }
+.card_img img{
+    width: 294px;
+    height: 200px;
+    object-fit: cover;
+    margin-left: 24px;
+    border-radius: 16px;
+}
 .gre{
     background-color: #ECFFEC;
 }

@@ -452,9 +452,17 @@ $products = $query->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endif; ?>
                                 </div>
                                 <div class="btn_news_card">
-                                    <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                    <!-- <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
                                         <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
-                                    </button>
+                                    </button> -->
+                                    <div class="product-buttons">
+                                                        <button class="add-to-cart-btn" data-product-id="<?= $product['id'] ?>">
+                                                            <img src="./media/popular-product/иконка добавить в корзину.svg" alt="Добавить в корзину">
+                                                        </button>
+                                                            <button class="add-to-favorites-btn" data-product-id="<?= $product['id'] ?>">
+                                                                <img class="img_favorites" src="./media/modal/Vector (2).png" alt="Добавить в избранное">
+                                                            </button>
+                                                    </div>
                                 </div>
                             </div>
                         </div>
